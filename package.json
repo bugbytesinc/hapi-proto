@@ -1,13 +1,13 @@
 {
   "name": "@bugbytes/hapi-proto",
-  "version": "0.28.0",
+  "version": "0.31.0",
   "description": "Hedera API Protobuf Typescript/Javascript Bindings",  
   "main": "./lib/index.js",
   "exports": "./lib/index.js",
   "scripts": {
     "clean": "node script/clean.mjs",
     "build:prepare": "node script/build-prepare.mjs",
-    "build:generate": "grpc_tools_node_protoc --proto_path=reference/hedera-protobufs/services --ts_proto_opt=esModuleInterop=true --ts_proto_opt=useExactTypes=false --plugin=node_modules/ts-proto/protoc-gen-ts_proto.cmd --ts_proto_opt=oneof=unions --ts_proto_out=./src/services/ ./reference/hedera-protobufs/services/*.proto",
+    "build:generate": "grpc_tools_node_protoc --proto_path=src/proto-src --ts_proto_opt=esModuleInterop=true --ts_proto_opt=useExactTypes=false --plugin=node_modules/ts-proto/protoc-gen-ts_proto.cmd --ts_proto_opt=oneof=unions --ts_proto_out=./src/proto/ ./src/proto-src/*.proto",
     "build:index": "node script/build-index.mjs",
     "build:tsc": "tsc",
     "build:package": "node script/build-package.mjs",
@@ -32,16 +32,16 @@
     "lib/**"
   ],
   "peerDependencies": {
-    "long": ">=4.0.0",
-    "protobufjs": ">=7.0.0"
+    "long": ">=5.2.0",
+    "protobufjs": ">=7.1.2"
   },
   "devDependencies": {
     "grpc_tools_node_protoc_ts": "^5.3.2",
-    "grpc-tools": "^1.11.2",
+    "grpc-tools": "^1.11.3",
     "long": "^5.2.0",
-    "protobufjs": "^7.0.0",
+    "protobufjs": "^7.1.2",
     "ts-node": "^10.7.0",
-    "ts-proto": "^1.118.0",
-    "typescript": "^4.6.4"
+    "ts-proto": "^1.131.0",
+    "typescript": "^4.8.4"
   }
 }

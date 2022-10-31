@@ -5,7 +5,7 @@ import ts from 'typescript';
 
 const projDir = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
 const baseSrcDir = path.join(projDir, 'src');
-const allSources = fs.readdirSync(path.join(baseSrcDir, 'services')).filter(f => f.endsWith('.ts')).map(f => path.join(baseSrcDir, 'services', f));
+const allSources = fs.readdirSync(path.join(baseSrcDir, 'proto')).filter(f => f.endsWith('.ts')).map(f => path.join(baseSrcDir, 'proto', f));
 const protoSymbols = {};
 const protoExcludes = [
   'DeepPartial'
