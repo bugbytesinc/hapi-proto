@@ -25,7 +25,8 @@
         "stripInternal": true
     },
     "include": [
-        "src/index.ts"
+        "src/services/index.ts",
+        "src/mirror/index.ts"
     ],
     "exclude": [
         "node_modules"
