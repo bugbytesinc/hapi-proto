@@ -1,18 +1,17 @@
 {
   "name": "@bugbytes/hapi-proto",
-  "version": "0.31.1",
+  "version": "0.31.2",
   "description": "Hedera API Protobuf Typescript/Javascript Bindings",
   "main": "./lib/index.js",
   "exports": "./lib/index.js",
   "scripts": {
     "clean": "node script/clean.mjs",
     "build:prepare": "node script/build-prepare.mjs",
-    "build:generate:services": "grpc_tools_node_protoc --proto_path=reference/hedera-protobufs/services --ts_proto_opt=esModuleInterop=true --ts_proto_opt=useExactTypes=false --plugin=node_modules/ts-proto/protoc-gen-ts_proto.cmd --ts_proto_opt=oneof=unions --ts_proto_out=./src/services/services/ ./reference/hedera-protobufs/services/*.proto",
-    "build:generate:mirror": "grpc_tools_node_protoc --proto_path=reference/hedera-protobufs/mirror --proto_path=reference/hedera-protobufs/services --ts_proto_opt=esModuleInterop=true --ts_proto_opt=useExactTypes=false --plugin=node_modules/ts-proto/protoc-gen-ts_proto.cmd --ts_proto_opt=oneof=unions --ts_proto_out=./src/mirror/mirror/ ./reference/hedera-protobufs/mirror/*.proto",
+    "build:generate": "grpc_tools_node_protoc --proto_path=src/proto-src --ts_proto_opt=esModuleInterop=true --ts_proto_opt=useExactTypes=false --plugin=node_modules/ts-proto/protoc-gen-ts_proto.cmd --ts_proto_opt=oneof=unions --ts_proto_out=./src/proto/ ./src/proto-src/*.proto",
     "build:index": "node script/build-index.mjs",
     "build:tsc": "tsc",
     "build:package": "node script/build-package.mjs",
-    "build": "npm run build:prepare && npm run build:generate:services && npm run build:generate:mirror && npm run build:index && npm run build:tsc && npm run build:package",
+    "build": "npm run build:prepare && npm run build:generate && npm run build:index && npm run build:tsc && npm run build:package",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

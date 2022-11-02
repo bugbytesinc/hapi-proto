@@ -1,7 +1,7 @@
 {
-  "name": "@bugbytes/hapi-mirror-proto",
-  "version": "0.31.1",
-  "description": "Hedera Mirror Streaming Node Protobuf Typescript/Javascript Bindings",
+  "name": "@bugbytes/hapi-proto",
+  "version": "0.31.2",
+  "description": "Hedera API Protobuf Typescript/Javascript Bindings",
   "main": "./index.js",
   "exports": "./index.js",
   "scripts": {
@@ -12,7 +12,6 @@
     "url": "git+https://github.com/bugbytesinc/hapi-proto.git"
   },
   "keywords": [
-    "Mirror",
     "Hashgraph",
     "HAPI"
   ],
@@ -24,7 +23,6 @@
   "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
   "peerDependencies": {
     "long": ">=5.2.0",
-    "protobufjs": ">=7.1.2",
-    "rxjs": "^7.5.7"
+    "protobufjs": ">=7.1.2"
   }
 }
