@@ -3,7 +3,8 @@ import fs from 'fs';
 import url from 'url';
 import ts from 'typescript';
 
-const projDir = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
+const rootDir = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
+const projDir = path.join(rootDir, 'packages', 'hapi-proto');
 const baseSrcDir = path.join(projDir, 'src');
 const allSources = fs.readdirSync(path.join(baseSrcDir, 'proto')).filter(f => f.endsWith('.ts')).map(f => path.join(baseSrcDir, 'proto', f));
 const protoSymbols = {};

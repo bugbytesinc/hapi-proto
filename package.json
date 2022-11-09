@@ -1,41 +1,23 @@
 {
-  "name": "@bugbytes/hapi-proto",
-  "version": "0.31.2",
-  "description": "Hedera API Protobuf Typescript/Javascript Bindings",
-  "main": "./lib/index.js",
-  "exports": "./lib/index.js",
+  "name": "hapi",
+  "private": true,
   "scripts": {
     "clean": "node script/clean.mjs",
     "build:prepare": "node script/build-prepare.mjs",
-    "build:generate": "grpc_tools_node_protoc --proto_path=src/proto-src --ts_proto_opt=esModuleInterop=true --ts_proto_opt=useExactTypes=false --plugin=node_modules/ts-proto/protoc-gen-ts_proto.cmd --ts_proto_opt=oneof=unions --ts_proto_out=./src/proto/ ./src/proto-src/*.proto",
+    "build:proto": "grpc_tools_node_protoc --proto_path=packages/hapi-proto/src/proto-src --ts_proto_opt=esModuleInterop=true --ts_proto_opt=useExactTypes=false --plugin=node_modules/ts-proto/protoc-gen-ts_proto.cmd --ts_proto_opt=oneof=unions --ts_proto_out=./packages/hapi-proto/src/proto/ ./packages/hapi-proto/src/proto-src/*.proto",
     "build:index": "node script/build-index.mjs",
-    "build:tsc": "tsc",
+    "build:tsc": "tsc --build ./tsconfig.project.json",
     "build:package": "node script/build-package.mjs",
-    "build": "npm run build:prepare && npm run build:generate && npm run build:index && npm run build:tsc && npm run build:package",
+    "build": "npm run build:prepare && npm run build:proto && npm run build:index && npm run build:tsc && npm run build:package",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bugbytesinc/hapi-proto.git"
   },
-  "keywords": [
-    "Hashgraph",
-    "HAPI"
-  ],
-  "author": "BugBytes, Inc.",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/bugbytesinc/hapi-proto/issues"
-  },
-  "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
-  "files": [
-    "lib/**"
-  ],
-  "peerDependencies": {
-    "long": ">=5.2.0",
-    "protobufjs": ">=7.1.2"
-  },
   "devDependencies": {
+    "@noble/ed25519": "^1.7.1",
+    "@noble/secp256k1": "^1.7.0",
     "grpc_tools_node_protoc_ts": "^5.3.2",
     "grpc-tools": "^1.11.3",
     "long": "^5.2.0",
@@ -44,5 +26,8 @@
     "ts-node": "^10.7.0",
     "ts-proto": "^1.131.0",
     "typescript": "^4.8.4"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

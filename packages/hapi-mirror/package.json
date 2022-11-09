@@ -1,0 +1,34 @@
+{
+  "name": "@bugbytes/hapi-mirror",
+  "version": "0.31.3",
+  "description": "Hedera Mirror Node Client",
+  "main": "./lib/index.js",
+  "exports": "./lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "directory": "packages/hapi-mirror",
+    "type": "git",
+    "url": "git+https://github.com/bugbytesinc/hapi-proto.git"
+  },
+  "keywords": [
+    "Hashgraph",
+    "HAPI",
+    "Mirror"
+  ],
+  "author": "BugBytes, Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bugbytesinc/hapi-proto/issues"
+  },
+  "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
+  "dependencies": {
+    "@bugbytes/hapi-proto": "0.31.3",
+    "@bugbytes/hapi-util": "0.31.3"
+  },
+  "peerDependencies": {    
+    "long": ">=5.2.0",
+    "protobufjs": ">=7.1.2"
+  }
+}

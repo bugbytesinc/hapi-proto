@@ -1,13 +1,14 @@
 {
   "name": "@bugbytes/hapi-proto",
-  "version": "0.31.2",
+  "version": "0.31.3",
   "description": "Hedera API Protobuf Typescript/Javascript Bindings",
-  "main": "./index.js",
-  "exports": "./index.js",
+  "main": "./lib/index.js",
+  "exports": "./lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
+    "directory": "packages/hapi-proto",
     "type": "git",
     "url": "git+https://github.com/bugbytesinc/hapi-proto.git"
   },
