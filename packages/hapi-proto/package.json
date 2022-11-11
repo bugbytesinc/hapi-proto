@@ -24,6 +24,7 @@
   "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
   "peerDependencies": {
     "long": ">=5.2.0",
-    "protobufjs": ">=7.1.2"
+    "protobufjs": ">=7.1.2",
+    "rxjs": "^7.5.7"
   }
 }

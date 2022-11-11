@@ -1,20 +1,22 @@
 {
-  "name": "@bugbytes/hapi-util",
+  "name": "@bugbytes/hapi-connect",
   "version": "0.31.3",
-  "description": "Hedera API Protobuf Typescript/Javascript Utilities",
-  "main": "./index.js",
-  "exports": "./index.js",
+  "description": "Lightweight HashConnect Browser Side Client Library",
+  "main": "./lib/index.js",
+  "exports": "./lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
-    "directory": "packages/hapi-proto",
+    "directory": "packages/hapi-connect",
     "type": "git",
     "url": "git+https://github.com/bugbytesinc/hapi-proto.git"
   },
   "keywords": [
     "Hashgraph",
-    "HAPI"
+    "HAPI",
+    "Mirror",
+    "HashConnect"
   ],
   "author": "BugBytes, Inc.",
   "license": "MIT",
@@ -22,11 +24,12 @@
     "url": "https://github.com/bugbytesinc/hapi-proto/issues"
   },
   "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
-  "peerDependencies": {
+  "peerDependencies": {    
     "@bugbytes/hapi-proto": "0.31.3",
-    "@noble/ed25519": "^1.7.1",
-    "@noble/secp256k1": "^1.7.0",
+    "@bugbytes/hapi-util": "0.31.3",
     "long": ">=5.2.0",
-    "protobufjs": ">=7.1.2"
+    "protobufjs": ">=7.1.2",
+    "simple-crypto-js": "^3.0.1",
+    "ts-typed-events": "^3.0.0"
   }
 }

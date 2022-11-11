@@ -9,6 +9,7 @@
     "build:tsc": "tsc --build ./tsconfig.project.json",
     "build:package": "node script/build-package.mjs",
     "build": "npm run build:prepare && npm run build:proto && npm run build:index && npm run build:tsc && npm run build:package",
+    "build:tgz": "node script/build-tgz.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,8 +24,10 @@
     "long": "^5.2.0",
     "protobufjs": "^7.1.2",
     "rxjs": "^7.5.7",
+    "simple-crypto-js": "^3.0.1",
     "ts-node": "^10.7.0",
     "ts-proto": "^1.131.0",
+    "ts-typed-events": "^3.0.0",
     "typescript": "^4.8.4"
   },
   "workspaces": [

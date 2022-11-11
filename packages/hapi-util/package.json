@@ -22,10 +22,8 @@
     "url": "https://github.com/bugbytesinc/hapi-proto/issues"
   },
   "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
-  "dependencies": {
-    "@bugbytes/hapi-proto": "0.31.3"
-  },
-  "peerDependencies": {    
+  "peerDependencies": {
+    "@bugbytes/hapi-proto": "0.31.3",
     "@noble/ed25519": "^1.7.1",
     "@noble/secp256k1": "^1.7.0",
     "long": ">=5.2.0",

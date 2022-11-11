@@ -7,6 +7,7 @@ const rootDir = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '
 prepareHapiProto();
 prepareHapiUtil();
 prepareHapiMirror();
+prepareHapiConnect();
 
 function prepareHapiProto() {
     const projDir = path.join(rootDir, 'packages', 'hapi-proto');
@@ -42,6 +43,14 @@ function prepareHapiUtil() {
 
 function prepareHapiMirror() {
     const projDir = path.join(rootDir, 'packages', 'hapi-mirror');
+    const libDir = path.join(projDir, 'lib');
+
+    fs.rmSync(libDir, { recursive: true, force: true });
+    fs.rmSync(path.join(projDir, 'tsconfig.tsbuildinfo'), { force: true });
+}
+
+function prepareHapiConnect() {
+    const projDir = path.join(rootDir, 'packages', 'hapi-connect');
     const libDir = path.join(projDir, 'lib');
 
     fs.rmSync(libDir, { recursive: true, force: true });

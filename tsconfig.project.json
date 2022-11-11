@@ -14,6 +14,9 @@
         },
         {
             "path": "./packages/hapi-mirror"
+        },
+        {
+            "path": "./packages/hapi-connect"
         }
     ],
     "files": []

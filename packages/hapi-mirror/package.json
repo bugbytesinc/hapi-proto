@@ -23,11 +23,9 @@
     "url": "https://github.com/bugbytesinc/hapi-proto/issues"
   },
   "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
-  "dependencies": {
+  "peerDependencies": {
     "@bugbytes/hapi-proto": "0.31.3",
-    "@bugbytes/hapi-util": "0.31.3"
-  },
-  "peerDependencies": {    
+    "@bugbytes/hapi-util": "0.31.3",
     "long": ">=5.2.0",
     "protobufjs": ">=7.1.2"
   }

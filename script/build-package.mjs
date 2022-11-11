@@ -4,27 +4,16 @@ import url from 'url';
 
 const rootDir = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
 
-copyHapiProtoPackageFiles();
-copyHapiUtilPackageFiles();
-copyHapiMirrorPackageFiles();
+copyPackageJsonFile('hapi-proto');
+copyPackageJsonFile('hapi-util');
+copyPackageJsonFile('hapi-mirror');
+copyPackageJsonFile('hapi-connect');
 
-function copyHapiProtoPackageFiles() {
-    const projDir = path.join(rootDir, 'packages', 'hapi-proto');
+function copyPackageJsonFile(project) {
+    const projDir = path.join(rootDir, 'packages', project);
     const libDir = path.join(projDir, 'lib');
-
-    fs.copyFileSync(path.join(projDir, 'package.publish.json'), path.join(libDir, 'package.json'));
-}
-
-function copyHapiUtilPackageFiles() {
-    const projDir = path.join(rootDir, 'packages', 'hapi-util');
-    const libDir = path.join(projDir, 'lib');
-
-    fs.copyFileSync(path.join(projDir, 'package.publish.json'), path.join(libDir, 'package.json'));
-}
-
-function copyHapiMirrorPackageFiles() {
-    const projDir = path.join(rootDir, 'packages', 'hapi-mirror');
-    const libDir = path.join(projDir, 'lib');
-
-    fs.copyFileSync(path.join(projDir, 'package.publish.json'), path.join(libDir, 'package.json'));
+    const pkg = JSON.parse(fs.readFileSync(path.join(projDir, 'package.json'), 'utf-8'));
+    pkg['main'] = './index.js';
+    pkg['exports'] = './index.js';
+    fs.writeFileSync(path.join(libDir, 'package.json'), JSON.stringify(pkg, null, 2), 'utf-8');
 }
