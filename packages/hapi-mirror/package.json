@@ -1,6 +1,6 @@
 {
   "name": "@bugbytes/hapi-mirror",
-  "version": "0.31.3",
+  "version": "0.31.4",
   "description": "Hedera Mirror Node Client",
   "main": "./lib/index.js",
   "exports": "./lib/index.js",
@@ -24,8 +24,8 @@
   },
   "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
   "peerDependencies": {
-    "@bugbytes/hapi-proto": "0.31.3",
-    "@bugbytes/hapi-util": "0.31.3",
+    "@bugbytes/hapi-proto": "0.31.4",
+    "@bugbytes/hapi-util": "0.31.4",
     "long": ">=5.2.0",
     "protobufjs": ">=7.1.2"
   }
