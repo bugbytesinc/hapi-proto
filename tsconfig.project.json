@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "lib": [
+            "ESNext"
+        ],
+        "preserveWatchOutput": true,
+    },
+    "references": [
+        {
+            "path": "./packages/hapi-proto"
+        },
+        {
+            "path": "./packages/hapi-util"
+        },
+        {
+            "path": "./packages/hapi-mirror"
+        },
+        {
+            "path": "./packages/hapi-connect"
+        }
+    ],
+    "files": []
+}

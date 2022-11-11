@@ -1,0 +1,30 @@
+{
+  "name": "@bugbytes/hapi-proto",
+  "version": "0.31.4",
+  "description": "Hedera API Protobuf Typescript/Javascript Bindings",
+  "main": "./lib/index.js",
+  "exports": "./lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "directory": "packages/hapi-proto",
+    "type": "git",
+    "url": "git+https://github.com/bugbytesinc/hapi-proto.git"
+  },
+  "keywords": [
+    "Hashgraph",
+    "HAPI"
+  ],
+  "author": "BugBytes, Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bugbytesinc/hapi-proto/issues"
+  },
+  "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
+  "peerDependencies": {
+    "long": ">=5.2.0",
+    "protobufjs": ">=7.1.2",
+    "rxjs": "^7.5.7"
+  }
+}

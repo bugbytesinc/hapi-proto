@@ -1,19 +1,21 @@
 {
-  "name": "@bugbytes/hapi-proto",
-  "version": "0.31.2",
-  "description": "Hedera API Protobuf Typescript/Javascript Bindings",
-  "main": "./index.js",
-  "exports": "./index.js",
+  "name": "@bugbytes/hapi-mirror",
+  "version": "0.31.4",
+  "description": "Hedera Mirror Node Client",
+  "main": "./lib/index.js",
+  "exports": "./lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
+    "directory": "packages/hapi-mirror",
     "type": "git",
     "url": "git+https://github.com/bugbytesinc/hapi-proto.git"
   },
   "keywords": [
     "Hashgraph",
-    "HAPI"
+    "HAPI",
+    "Mirror"
   ],
   "author": "BugBytes, Inc.",
   "license": "MIT",
@@ -22,6 +24,8 @@
   },
   "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
   "peerDependencies": {
+    "@bugbytes/hapi-proto": "0.31.4",
+    "@bugbytes/hapi-util": "0.31.4",
     "long": ">=5.2.0",
     "protobufjs": ">=7.1.2"
   }

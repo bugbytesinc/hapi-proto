@@ -1,0 +1,35 @@
+{
+  "name": "@bugbytes/hapi-connect",
+  "version": "0.31.4",
+  "description": "Lightweight HashConnect Browser Side Client Library",
+  "main": "./lib/index.js",
+  "exports": "./lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "directory": "packages/hapi-connect",
+    "type": "git",
+    "url": "git+https://github.com/bugbytesinc/hapi-proto.git"
+  },
+  "keywords": [
+    "Hashgraph",
+    "HAPI",
+    "Mirror",
+    "HashConnect"
+  ],
+  "author": "BugBytes, Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bugbytesinc/hapi-proto/issues"
+  },
+  "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
+  "peerDependencies": {    
+    "@bugbytes/hapi-proto": "0.31.4",
+    "@bugbytes/hapi-util": "0.31.4",
+    "long": ">=5.2.0",
+    "protobufjs": ">=7.1.2",
+    "simple-crypto-js": "^3.0.1",
+    "ts-typed-events": "^3.0.0"
+  }
+}
