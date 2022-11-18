@@ -77,9 +77,12 @@ export class MirrorRestClient {
 		return await response.json() as ContractInfo;
 	}
 
-	async getTokenInfo(tokenId: EntityIdKeyString | TokenID): Promise<TokenInfo> {
+	async getTokenInfo(tokenId: EntityIdKeyString | TokenID, timestamp: TimestampKeyString | Timestamp | undefined = undefined): Promise<TokenInfo> {
 		const tokenKey = (typeof tokenId === 'string') ? tokenId : tokenID_to_keyString(tokenId);
-		const path = `/api/v1/tokens/${tokenKey}`;
+		const timestampKey = timestamp ? ((typeof timestamp === 'string') ? timestamp : timestamp_to_keyString(timestamp)) : undefined;
+		const path = timestampKey ?
+			`/api/v1/tokens/${tokenKey}&timestamp=${timestampKey}` :
+			`/api/v1/tokens/${tokenKey}`;
 		const response = await fetch(this.mirrorHostname + path);
 		if (!response.ok) {
 			throw new MirrorError(response.statusText, response.status);
@@ -87,12 +90,12 @@ export class MirrorRestClient {
 		return await response.json() as TokenInfo;
 	}
 
-	async getTokenBalance(accountId: EntityIdKeyString | AccountID, tokenId: EntityIdKeyString | TokenID, timestamp: TimestampKeyString | Timestamp | undefined): Promise<TokenBalanceInfo> {
+	async getTokenBalance(accountId: EntityIdKeyString | AccountID, tokenId: EntityIdKeyString | TokenID, timestamp: TimestampKeyString | Timestamp | undefined = undefined): Promise<TokenBalanceInfo> {
 		const accountKey = (typeof accountId === 'string') ? accountId : accountID_to_keyString(accountId);
 		const tokenKey = (typeof tokenId === 'string') ? tokenId : tokenID_to_keyString(tokenId);
 		const timestampKey = timestamp ? ((typeof timestamp === 'string') ? timestamp : timestamp_to_keyString(timestamp)) : undefined;
 		const path = timestampKey ?
-			`/api/v1/tokens/${tokenKey}/balances?account.id=${accountKey}&timestamp=lte:${timestamp}` :
+			`/api/v1/tokens/${tokenKey}/balances?account.id=${accountKey}&timestamp=lte:${timestampKey}` :
 			`/api/v1/tokens/${tokenKey}/balances?account.id=${accountKey}`;
 		const response = await fetch(this.mirrorHostname + path);
 		if (!response.ok) {
