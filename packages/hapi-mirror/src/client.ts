@@ -81,7 +81,7 @@ export class MirrorRestClient {
 		const tokenKey = (typeof tokenId === 'string') ? tokenId : tokenID_to_keyString(tokenId);
 		const timestampKey = timestamp ? ((typeof timestamp === 'string') ? timestamp : timestamp_to_keyString(timestamp)) : undefined;
 		const path = timestampKey ?
-			`/api/v1/tokens/${tokenKey}&timestamp=${timestampKey}` :
+			`/api/v1/tokens/${tokenKey}?timestamp=${timestampKey}` :
 			`/api/v1/tokens/${tokenKey}`;
 		const response = await fetch(this.mirrorHostname + path);
 		if (!response.ok) {
