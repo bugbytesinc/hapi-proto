@@ -12,13 +12,20 @@ export type ContractResult = components["schemas"]["ContractResult"];
 export type MessageInfo = components["schemas"]["TopicMessage"];
 export type TransactionInfo = components["schemas"]["Transaction"];
 export type TokenBalanceInfo = { timestamp: TimestampKeyString, account: EntityIdKeyString, token: EntityIdKeyString, balance: number };
+export type TokenRelationship = components["schemas"]["TokenRelationship"]
+export type TokenRelationshipIterator = AsyncGenerator<TokenRelationship, void, unknown>;
+export type Nft = components["schemas"]["Nft"]
+export type NftIterator = AsyncGenerator<Nft, void, unknown>;
 
 type NodeInfoListResponse = components["schemas"]["NetworkNodesResponse"];
 type MessageInfoListResponse = components["schemas"]["TopicMessagesResponse"];
 type TokenBalanceListResponse = components["schemas"]["TokenBalancesResponse"];
 type TransactionsListResponse = components["schemas"]["TransactionsResponse"];
+type TokenRelationshipListResponse = components["schemas"]["TokenRelationshipResponse"];
+type NftListResponse = components["schemas"]["Nfts"];
 
 export class MirrorRestClient {
+	
 	private readonly mirrorHostname: string;
 
 	constructor(mirrorHostname: string) {
@@ -65,6 +72,42 @@ export class MirrorRestClient {
 			throw new MirrorError(response.statusText, response.status);
 		}
 		return await response.json() as AccountInfo;
+	}
+
+	async * getAccountTokens(accountId: EntityIdKeyString | AccountID): TokenRelationshipIterator {
+		const accountKey = (typeof accountId === 'string') ? accountId : accountID_to_keyString(accountId);
+		let path = `/api/v1/accounts/${accountKey}/tokens`;
+		while (path) {
+			const response = await fetch(this.mirrorHostname + path);
+			if (!response.ok) {
+				throw new MirrorError(response.statusText, response.status);
+			}
+			const payload = await response.json() as TokenRelationshipListResponse;
+			if (payload.tokens) {
+				for (const item of payload.tokens) {
+					yield item;
+				}
+			}
+			path = payload.links?.next || '';
+		}
+	}
+
+	async * getAccountNfts(accountId: EntityIdKeyString | AccountID): NftIterator {
+		const accountKey = (typeof accountId === 'string') ? accountId : accountID_to_keyString(accountId);
+		let path = `/api/v1/accounts/${accountKey}/nfts`;
+		while (path) {
+			const response = await fetch(this.mirrorHostname + path);
+			if (!response.ok) {
+				throw new MirrorError(response.statusText, response.status);
+			}
+			const payload = await response.json() as NftListResponse;
+			if (payload.nfts) {
+				for (const item of payload.nfts) {
+					yield item;
+				}
+			}
+			path = payload.links?.next || '';
+		}
 	}
 
 	async getContractInfo(contractId: EntityIdKeyString | ContractID): Promise<ContractInfo> {
@@ -147,5 +190,4 @@ export class MirrorRestClient {
 		}
 		throw new MirrorError('No Messages Found.', 404);
 	}
-
 }
