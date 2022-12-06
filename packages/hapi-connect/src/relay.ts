@@ -1,21 +1,29 @@
-import { createEmitter } from "ts-typed-events";
+import { createEmitter, Emitter, SealedEvent } from "ts-typed-events";
 
 
 export class Relay {
+  
   private readonly url: string;
   private socket!: WebSocket;
-  private readonly emitConnected = createEmitter();
-  private readonly emitDisconnected = createEmitter();
-  private readonly emitReceived = createEmitter<string>();
-  public readonly received = this.emitReceived.event;
-  public readonly connected = this.emitConnected.event;
-  public readonly disconnected = this.emitDisconnected.event;
+  private readonly emitConnected: Emitter<undefined, SealedEvent<undefined>>;
+  private readonly emitDisconnected: Emitter<undefined, SealedEvent<undefined>>;
+  private readonly emitReceived: Emitter<string, SealedEvent<string>>;
+  public readonly received: SealedEvent<string>;
+  public readonly connected: SealedEvent<undefined>;
+  public readonly disconnected: SealedEvent<undefined>;
+
   public get isOpen() {
     return this.socket.readyState === WebSocket.OPEN;
   }
 
   constructor(url = "wss://hashconnect.hashpack.app") {
     this.url = url;
+    this.emitConnected = createEmitter();
+    this.emitDisconnected = createEmitter();
+    this.emitReceived = createEmitter<string>();
+    this.received = this.emitReceived.event;
+    this.connected = this.emitConnected.event;
+    this.disconnected = this.emitDisconnected.event;  
     this.connect();
   }
 

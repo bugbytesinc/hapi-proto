@@ -1,4 +1,5 @@
 export class MirrorError extends Error {
+    
     readonly status: number;
     readonly innerError: Error | undefined
 

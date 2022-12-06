@@ -14,11 +14,14 @@ declare global {
 declare type Handler = (value: RelayMessage) => boolean;
 
 export class HashConnectClient {
+  
   private readonly relay: Relay;
-  private topics = new Map<string, string>();
-  private pending: Handler[] = [];
+  private readonly topics: Map<string, string>;
+  private readonly pending: Handler[];
 
   constructor(relay = new Relay()) {
+    this.topics = new Map<string, string>();
+    this.pending = [];
     this.relay = relay;
     this.relay.connected.on(() => {
       for (const topic of this.topics.keys()) {

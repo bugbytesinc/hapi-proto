@@ -54,6 +54,10 @@ export interface paths {
      */
     get: operations["listNftByAccountId"];
   };
+  "/api/v1/accounts/{idOrAliasOrEvmAddress}/tokens": {
+    /** Returns information for all token relationships for an account. */
+    get: operations["listTokenRelationshipByAccountId"];
+  };
   "/api/v1/accounts/{idOrAliasOrEvmAddress}/allowances/crypto": {
     /** Returns information for all crypto allowances for an account. */
     get: operations["listCryptoAllowancesByAccountId"];
@@ -104,15 +108,19 @@ export interface paths {
     /** Returns a list of all contract entity items on the network. */
     get: operations["listContracts"];
   };
-  "/api/v1/contracts/{contractIdOrAddress}": {
+  "/api/v1/contracts/{contractIdOrAddressPathParam}": {
     /** Return the contract information given an id */
     get: operations["getContractById"];
   };
-  "/api/v1/contracts/{contractIdOrAddress}/results": {
+  "/api/v1/contracts/{contractIdOrAddressPathParam}/results": {
     /** Returns a list of all ContractResults for a contract's function executions. */
     get: operations["listContractResults"];
   };
-  "/api/v1/contracts/{contractIdOrAddress}/results/{timestamp}": {
+  "/api/v1/contracts/{contractIdOrAddressPathParam}/state": {
+    /** Returns a list of all contract's slots. */
+    get: operations["listContractState"];
+  };
+  "/api/v1/contracts/{contractIdOrAddressPathParam}/results/{timestamp}": {
     /** Returns a single ContractResult for a contract's function executions at a specific timestamp. */
     get: operations["getContractResultByIdAndTimestamp"];
   };
@@ -124,7 +132,11 @@ export interface paths {
     /** Returns a single ContractResult for a contract's function executions for a given transactionId or ethereum transaction hash. */
     get: operations["getContractResultByTransactionIdOrHash"];
   };
-  "/api/v1/contracts/{contractIdOrAddress}/results/logs": {
+  "/api/v1/contracts/results/{transactionIdOrHash}/actions": {
+    /** Returns a list of ContractActions for a contract's function executions for a given transactionId or ethereum transaction hash. */
+    get: operations["getContractActionsByTransactionIdOrHash"];
+  };
+  "/api/v1/contracts/{contractIdOrAddressPathParam}/results/logs": {
     /**
      * Search the logs of a specific contract across multiple contract calls. Chained logs are not
      * included but can be found by calling `/api/v1/contracts/{contractId}/results/{timestamp}`
@@ -238,7 +250,7 @@ export interface paths {
     /** Returns a single topic message the given topic id and sequence number. */
     get: operations["getTopicMessageByIdAndSequenceNumber"];
   };
-  "/api/v1/topics/messages/{consensusTimestamp}": {
+  "/api/v1/topics/messages/{timestamp}": {
     /** Returns a topic message the given the consensusTimestamp. */
     get: operations["getTopicMessagesByConsensusTimestamp"];
   };
@@ -311,6 +323,14 @@ export interface components {
       contracts?: components["schemas"]["ContractResults"];
       links?: components["schemas"]["Links"];
     };
+    ContractStateResponse: {
+      state?: components["schemas"]["ContractState"][];
+      links?: components["schemas"]["Links"];
+    };
+    ContractActionsResponse: {
+      actions?: components["schemas"]["ContractActions"];
+      links?: components["schemas"]["Links"];
+    };
     ContractLogsResponse: {
       logs?: components["schemas"]["ContractLogs"];
     };
@@ -352,7 +372,7 @@ export interface components {
       links?: components["schemas"]["Links"];
     };
     BlocksResponse: {
-      schedules?: components["schemas"]["Blocks"];
+      blocks?: components["schemas"]["Blocks"];
       links?: components["schemas"]["Links"];
     };
     /**
@@ -447,7 +467,10 @@ export interface components {
       };
       /** @description The nodes' signature files for the record file */
       signature_files: { [key: string]: string };
-      /** @description The record file format version, either 5 or 6 */
+      /**
+       * Format: int32
+       * @description The record file format version, either 5 or 6
+       */
       version: number;
     };
     TokenAllowancesResponse: {
@@ -457,6 +480,10 @@ export interface components {
     TokenBalancesResponse: {
       timestamp?: components["schemas"]["TimestampNullable"];
       balances?: components["schemas"]["TokenDistribution"];
+      links?: components["schemas"]["Links"];
+    };
+    TokenRelationshipResponse: {
+      tokens?: components["schemas"]["TokenRelationship"][];
       links?: components["schemas"]["Links"];
     };
     TokensResponse: {
@@ -489,6 +516,7 @@ export interface components {
      *       }
      *     ]
      *   },
+     *   "created_timestamp": "1562591528.000123456",
      *   "decline_reward": false,
      *   "deleted": false,
      *   "ethereum_nonce": 10,
@@ -497,10 +525,11 @@ export interface components {
      *   "key": null,
      *   "max_automatic_token_associations": 200,
      *   "memo": "entity memo",
+     *   "pending_reward": 100,
      *   "receiver_sig_required": false,
      *   "staked_account_id": null,
      *   "staked_node_id": 3,
-     *   "stake_period_start": 2000
+     *   "stake_period_start": "172800000.000000000"
      * }
      */
     AccountInfo: {
@@ -509,6 +538,7 @@ export interface components {
       /** Format: int64 */
       auto_renew_period: number | null;
       balance: components["schemas"]["Balance"];
+      created_timestamp: components["schemas"]["TimestampNullable"];
       /** @description Whether the account declines receiving a staking reward */
       decline_reward: boolean;
       deleted: boolean | null;
@@ -520,6 +550,12 @@ export interface components {
       /** Format: int32 */
       max_automatic_token_associations: number | null;
       memo: string | null;
+      /**
+       * Format: int64
+       * @description The pending reward in tinybars the account will receive in the next reward payout. Note the value is updated
+       * at the end of each staking period and there may be delay to reflect the changes in the past staking period.
+       */
+      pending_reward?: number;
       receiver_sig_required: boolean | null;
       staked_account_id: components["schemas"]["EntityId"] & unknown;
       /**
@@ -544,6 +580,7 @@ export interface components {
      */
     AccountBalance: {
       account: components["schemas"]["EntityId"];
+      /** Format: int64 */
       balance: number;
       tokens: components["schemas"]["TokenBalance"][];
     };
@@ -570,9 +607,11 @@ export interface components {
      */
     Balance: {
       timestamp: components["schemas"]["TimestampNullable"];
+      /** Format: int64 */
       balance: number | null;
       tokens: {
         token_id?: components["schemas"]["EntityId"];
+        /** Format: int64 */
         balance?: number;
       }[];
     } | null;
@@ -580,18 +619,27 @@ export interface components {
      * Format: binary
      * @example 0x549358c4c2e573e02410ef7b5a5ffa5f36dd7398
      */
-    Bloom: { [key: string]: unknown } | null;
+    Bloom: string | null;
     ChunkInfo: {
       initial_transaction_id?: components["schemas"]["TransactionId"];
-      /** @example 1 */
+      /**
+       * Format: int32
+       * @example 1
+       */
       number?: number;
-      /** @example 2 */
+      /**
+       * Format: int32
+       * @example 2
+       */
       total?: number;
     } | null;
     Contract: {
       admin_key?: components["schemas"]["Key"];
       auto_renew_account?: components["schemas"]["EntityId"];
-      /** @example null */
+      /**
+       * Format: int64
+       * @example 7776000
+       */
       auto_renew_period?: number | null;
       contract_id?: components["schemas"]["EntityId"];
       created_timestamp?: components["schemas"]["TimestampNullable"];
@@ -611,8 +659,30 @@ export interface components {
     };
     Contracts: components["schemas"]["Contract"][];
     ContractLog: components["schemas"]["ContractResultLog"] & {
+      /**
+       * @description The hex encoded block (record file chain) hash
+       * @example 0x553f9311833391c0a3b2f9ed64540a89f2190a511986cd94889f1c0cf7fa63e898b1c6730f14a61755d1fb4ca05fb073
+       */
+      block_hash?: string;
+      /**
+       * Format: int64
+       * @description The block number. Since Hedera does not have the native concept of blocks, this counts the number of record files seen since the mirror node's configured start date. This can vary between mirror nodes that use different start dates.
+       * @example 10
+       */
+      block_number?: number;
       root_contract_id?: components["schemas"]["EntityId"] & unknown;
       timestamp?: components["schemas"]["Timestamp"];
+      /**
+       * @description A hex encoded transaction hash
+       * @example 0x397022d1e5baeb89d0ab66e6bf602640610e6fb7e55d78638db861e2c6339aa9
+       */
+      transaction_hash?: string;
+      /**
+       * Format: int32
+       * @description The position of the transaction in the block
+       * @example 1
+       */
+      transaction_index?: number | null;
     };
     /**
      * @description A list of hex encoded topics associated with this log event
@@ -621,6 +691,94 @@ export interface components {
      * ]
      */
     ContractLogTopics: string[];
+    ContractAction: {
+      /**
+       * Format: int32
+       * @description The nesting depth of the call
+       * @example 1
+       */
+      call_depth?: number;
+      /**
+       * @description The type of the call operation
+       * @example CALL
+       * @enum {string}
+       */
+      call_operation_type?:
+        | "CALL"
+        | "CALLCODE"
+        | "CREATE"
+        | "CREATE2"
+        | "DELEGATECALL"
+        | "STATICCALL"
+        | "UNKNOWN";
+      /**
+       * @description The type of the call
+       * @example CALL
+       * @enum {string}
+       */
+      call_type?: "NO_ACTION" | "CALL" | "CREATE" | "PRECOMPILE" | "SYSTEM";
+      caller?: components["schemas"]["EntityId"];
+      /**
+       * @description The entity type of the caller
+       * @example ACCOUNT
+       * @enum {string}
+       */
+      caller_type?: "ACCOUNT" | "CONTRACT";
+      /**
+       * @description The EVM address of the caller
+       * @example 0x0000000000000000000000000000000000000065
+       */
+      from?: string;
+      /**
+       * Format: int64
+       * @description Gas cost in tinybars
+       * @example 50000
+       */
+      gas?: number;
+      /**
+       * Format: int64
+       * @description Gas used in tinybars
+       * @example 50000
+       */
+      gas_used?: number;
+      /**
+       * Format: int32
+       * @description The position of the action within the ordered list of actions
+       * @example 0
+       */
+      index?: number;
+      /**
+       * @description The hex encoded input data
+       * @example 0x123456
+       */
+      input?: string | null;
+      recipient?: components["schemas"]["EntityId"];
+      /**
+       * @description The entity type of the recipient
+       * @example ACCOUNT
+       * @enum {string|null}
+       */
+      recipient_type?: ("ACCOUNT" | "CONTRACT") | null;
+      /**
+       * @description The hex encoded result data
+       * @example 0x123456
+       */
+      result_data?: string | null;
+      /**
+       * @description The type of the result data
+       * @example OUTPUT
+       * @enum {string}
+       */
+      result_data_type?: "OUTPUT" | "REVERT_REASON" | "ERROR";
+      timestamp?: components["schemas"]["Timestamp"];
+      to?: components["schemas"]["EvmAddressNullable"];
+      /**
+       * Format: int64
+       * @description The value of the transaction in tinybars
+       * @example 50000
+       */
+      value?: number;
+    };
     ContractResult: {
       /**
        * Format: int64
@@ -664,7 +822,7 @@ export interface components {
        * @description A hex encoded 32 byte hash and it is only populated for Ethereum transaction case
        * @example 0xfebbaa29c513d124a6377246ea3506ad917d740c21a88f61a1c55ba338fc2bb1
        */
-      hash?: string | null;
+      hash?: string;
       /**
        * @description The result of the transaction
        * @example SUCCESS
@@ -787,6 +945,23 @@ export interface components {
       topics?: components["schemas"]["ContractLogTopics"];
     };
     ContractResultLogs: components["schemas"]["ContractResultLog"][];
+    ContractState: {
+      address: components["schemas"]["EvmAddress"];
+      contract_id: components["schemas"]["EntityId"];
+      timestamp: components["schemas"]["Timestamp"];
+      /**
+       * Format: binary
+       * @description The hex encoded storage slot.
+       * @example 0x00000000000000000000000000000000000000000000000000000000000000fa
+       */
+      slot: string;
+      /**
+       * Format: binary
+       * @description The hex encoded value to the slot. `0x` implies no value written.
+       * @example 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
+       */
+      value: string;
+    };
     ContractResultStateChange: {
       address?: components["schemas"]["EvmAddress"];
       contract_id?: components["schemas"]["EntityId"];
@@ -811,6 +986,7 @@ export interface components {
     };
     ContractResultStateChanges: components["schemas"]["ContractResultStateChange"][];
     ContractResults: components["schemas"]["ContractResult"][];
+    ContractActions: components["schemas"]["ContractAction"][];
     ContractLogs: components["schemas"]["ContractLog"][];
     CustomFees: {
       created_timestamp?: components["schemas"]["Timestamp"];
@@ -827,7 +1003,7 @@ export interface components {
      * @description Network entity ID in the format of `shard.realm.num`
      * @example 0.1.2
      */
-    EntityId: { [key: string]: unknown } | null;
+    EntityId: string | null;
     EntityIdQuery: string;
     Error: {
       _status?: {
@@ -850,7 +1026,7 @@ export interface components {
      * @description A network entity encoded as an EVM address in hex.
      * @example 0000000000000000000000000000000000001f41
      */
-    EvmAddress: { [key: string]: unknown };
+    EvmAddress: string;
     /**
      * Format: binary
      * @description A network entity encoded as an EVM address in hex.
@@ -864,45 +1040,84 @@ export interface components {
      */
     EvmAddressNullable: string | null;
     ExchangeRate: {
-      /** @example 596987 */
+      /**
+       * Format: int32
+       * @example 596987
+       */
       cent_equivalent?: number;
-      /** @example 1649689200 */
+      /**
+       * Format: int64
+       * @example 1649689200
+       */
       expiration_time?: number;
-      /** @example 30000 */
+      /**
+       * Format: int32
+       * @example 30000
+       */
       hbar_equivalent?: number;
     };
     FixedFee: {
-      /** @example 100 */
+      /** @example false */
+      all_collectors_are_exempt?: boolean;
+      /**
+       * Format: int64
+       * @example 100
+       */
       amount?: number;
       collector_account_id?: components["schemas"]["EntityId"];
       denominating_token_id?: components["schemas"]["EntityId"];
     };
     FractionalFee: {
+      /** @example false */
+      all_collectors_are_exempt?: boolean;
       amount?: {
-        /** @example 12 */
+        /**
+         * Format: int64
+         * @example 12
+         */
         numerator?: number;
-        /** @example 29 */
+        /**
+         * Format: int64
+         * @example 29
+         */
         denominator?: number;
       };
       collector_account_id?: components["schemas"]["EntityId"];
       denominating_token_id?: components["schemas"]["EntityId"];
-      /** @example 120 */
+      /**
+       * Format: int64
+       * @example 120
+       */
       maximum?: number | null;
-      /** @example 30 */
+      /**
+       * Format: int64
+       * @example 30
+       */
       minimum?: number;
       /** @example true */
       net_of_transfers?: boolean;
     };
     RoyaltyFee: {
+      /** @example false */
+      all_collectors_are_exempt?: boolean;
       amount?: {
-        /** @example 15 */
+        /**
+         * Format: int64
+         * @example 15
+         */
         numerator?: number;
-        /** @example 37 */
+        /**
+         * Format: int64
+         * @example 37
+         */
         denominator?: number;
       };
       collector_account_id?: components["schemas"]["EntityId"];
       fallback_fee?: {
-        /** @example 100 */
+        /**
+         * Format: int64
+         * @example 100
+         */
         amount?: number;
         denominating_token_id?: components["schemas"]["EntityId"];
       };
@@ -968,7 +1183,10 @@ export interface components {
        */
       min_stake: number | null;
       node_account_id: components["schemas"]["EntityId"];
-      /** @description An identifier for the node */
+      /**
+       * Format: int64
+       * @description An identifier for the node
+       */
       node_id: number;
       /** @description hex encoded hash of the node’s TLS certificate */
       node_cert_hash: string | null;
@@ -976,7 +1194,7 @@ export interface components {
       public_key: string | null;
       /**
        * Format: int64
-       * @description The total tinybars earned by this node in the last staking period
+       * @description The total tinybars earned by this node per whole hbar in the last staking period
        */
       reward_rate_start: number | null;
       service_endpoints: components["schemas"]["ServiceEndpoints"];
@@ -1096,6 +1314,10 @@ export interface components {
        */
       metadata?: string;
       modified_timestamp?: components["schemas"]["TimestampNullable"];
+      /**
+       * Format: int64
+       * @example 1
+       */
       serial_number?: number;
       spender?: components["schemas"]["EntityId"];
       token_id?: components["schemas"]["EntityId"];
@@ -1217,13 +1439,14 @@ export interface components {
      */
     ServiceEndpoint: {
       ip_address_v4: string;
+      /** Format: int32 */
       port: number;
     };
     ServiceEndpoints: components["schemas"]["ServiceEndpoint"][];
     /** @example 1586567700.453054000 */
-    Timestamp: { [key: string]: unknown };
+    Timestamp: string;
     /** @example 1586567700.453054000 */
-    TimestampNullable: { [key: string]: unknown } | null;
+    TimestampNullable: string | null;
     /** @description A timestamp range an entity is valid for */
     TimestampRange: {
       from?: components["schemas"]["Timestamp"] & unknown;
@@ -1255,6 +1478,7 @@ export interface components {
      */
     TokenBalance: {
       token_id: components["schemas"]["EntityId"];
+      /** Format: int64 */
       balance: number;
     };
     /**
@@ -1267,6 +1491,7 @@ export interface components {
      */
     TokenDistribution: {
       account: components["schemas"]["EntityId"];
+      /** Format: int64 */
       balance: number;
     }[];
     TokenInfo: {
@@ -1319,6 +1544,51 @@ export interface components {
       type?: "FUNGIBLE_COMMON" | "NON_FUNGIBLE_UNIQUE";
       wipe_key?: components["schemas"]["Key"];
       custom_fees?: components["schemas"]["CustomFees"];
+    };
+    /**
+     * @example {
+     *   "automatic_association": true,
+     *   "balance": 5,
+     *   "created_timestamp": 123456789,
+     *   "freeze_status": "UNFROZEN",
+     *   "kyc_status": "GRANTED",
+     *   "token_id": "0.0.27335"
+     * }
+     */
+    TokenRelationship: {
+      /**
+       * @description Specifies if the relationship is implicitly/explicity (true/false) associated.
+       * @example true
+       */
+      automatic_association: boolean;
+      /**
+       * Format: int64
+       * @description For FUNGIBLE_COMMON the balance that the Account holds in the smallest denomination.NON_FUNGIBLE_UNIQUE - the number of NFTs held by the account.
+       * @example 5
+       */
+      balance: number;
+      /**
+       * @description Creation timestamp of the token account relationship.
+       * @example 123456789
+       */
+      created_timestamp: components["schemas"]["Timestamp"];
+      /**
+       * @description The Freeze status of the account.
+       * @example UNFROZEN
+       * @enum {string}
+       */
+      freeze_status: "NOT_APPLICABLE" | "FROZEN" | "UNFROZEN";
+      /**
+       * @description The KYC status of the account.
+       * @example GRANTED
+       * @enum {string}
+       */
+      kyc_status: "NOT_APPLICABLE" | "GRANTED" | "REVOKED";
+      /**
+       * @description Id of the token associated with the given account.
+       * @example 0.0.27335
+       */
+      token_id: components["schemas"]["EntityId"];
     };
     LogTopicQueryParam: string[];
     /** @enum {string} */
@@ -1395,7 +1665,9 @@ export interface components {
       payer_account_id: components["schemas"]["EntityId"];
       /** Format: byte */
       running_hash: string;
+      /** Format: int32 */
       running_hash_version: number;
+      /** Format: int64 */
       sequence_number: number;
       topic_id: components["schemas"]["EntityId"];
     };
@@ -1454,6 +1726,7 @@ export interface components {
     Transaction: {
       /** Format: byte */
       bytes?: string | null;
+      /** Format: int64 */
       charged_tx_fee?: number;
       consensus_timestamp?: components["schemas"]["Timestamp"];
       entity_id?: components["schemas"]["EntityId"];
@@ -1469,6 +1742,7 @@ export interface components {
       token_transfers?: {
         token_id: components["schemas"]["EntityId"];
         account: components["schemas"]["EntityId"];
+        /** Format: int64 */
         amount: number;
         is_approval?: boolean;
       }[];
@@ -1477,6 +1751,7 @@ export interface components {
       transaction_id?: string;
       transfers?: {
         account: components["schemas"]["EntityId"];
+        /** Format: int64 */
         amount: number;
         is_approval?: boolean;
       }[];
@@ -1563,6 +1838,7 @@ export interface components {
      */
     TransactionDetail: components["schemas"]["Transaction"] & {
       assessed_custom_fees?: {
+        /** Format: int64 */
         amount?: number;
         collector_account_id?: components["schemas"]["EntityId"];
         effective_payer_account_ids?: components["schemas"]["EntityId"][];
@@ -1572,6 +1848,7 @@ export interface components {
         is_approval?: boolean;
         receiver_account_id?: components["schemas"]["EntityId"];
         sender_account_id?: components["schemas"]["EntityId"];
+        /** Format: int64 */
         serial_number: number;
         token_id: components["schemas"]["EntityId"];
       }[];
@@ -1579,7 +1856,10 @@ export interface components {
     TransactionDetails: components["schemas"]["TransactionDetail"][];
     TransactionId: {
       account_id?: components["schemas"]["EntityId"];
-      /** @example 0 */
+      /**
+       * Format: int32
+       * @example 0
+       */
       nonce?: number | null;
       /** @example false */
       scheduled?: boolean | null;
@@ -1623,11 +1903,7 @@ export interface components {
   };
   parameters: {
     /** @description Account alias or account id or evm address */
-    accountIdOrAliasOrEvmAddressPathParam:
-      | components["schemas"]["AccountAlias"]
-      | components["schemas"]["EntityId"]
-      | components["schemas"]["EvmAddress"]
-      | components["schemas"]["EvmAddressWithShardRealm"];
+    accountIdOrAliasOrEvmAddressPathParam: string;
     /** @description The optional balance value to compare against */
     accountBalanceQueryParam: string;
     /** @description The ID of the account to return information for */
@@ -1643,18 +1919,11 @@ export interface components {
      */
     balanceQueryParam: boolean;
     /** @description The ID of the smart contract */
-    contractIdQueryParam:
-      | components["schemas"]["EntityIdQuery"]
-      | components["schemas"]["EvmAddressWithShardRealm"];
-    /** @description The ID or hex encoded EVM address associated with this contract. */
-    contractIdPathParam:
-      | components["schemas"]["EntityId"]
-      | components["schemas"]["EvmAddressWithShardRealm"];
+    contractIdQueryParam: string;
+    /** @description The ID or hex encoded EVM address (with or without 0x prefix) associated with this contract. */
+    contractIdOrAddressPathParam: string;
     /** @description Accepts both eth and hedera hash format or block number */
-    hashOrNumberPathParam:
-      | components["schemas"]["HederaHash"]
-      | components["schemas"]["EthereumHash"]
-      | components["schemas"]["PositiveNumber"];
+    hashOrNumberPathParam: string;
     /** @description Entity id */
     entityIdPathParam: components["schemas"]["EntityId"];
     /** @description The ID of the file entity */
@@ -1666,9 +1935,7 @@ export interface components {
     /** @description Topic id */
     topicIdPathParam: components["schemas"]["EntityId"];
     /** @description Account ID or EVM address executing the contract */
-    fromQueryParam:
-      | components["schemas"]["EntityId"]
-      | components["schemas"]["EvmAddress"];
+    fromQueryParam: string;
     /** @description Contract log index */
     logIndexQueryParam: string;
     /**
@@ -1753,8 +2020,12 @@ export interface components {
      * ]
      */
     tokenTypeQueryParam: string[];
+    /** @description The index of a contract action */
+    contractActionsIndexQueryParam: string;
     /** @description The block's number */
     contractsBlockNumberQueryParam: string;
+    /** @description The slot's number */
+    slotQueryParam: string;
     /** @description The block's hash */
     blockHashQueryParam: string;
     /**
@@ -1768,9 +2039,7 @@ export interface components {
      */
     internalQueryParam: boolean;
     /** @description Transaction Id or a 32 byte hash with optional 0x prefix */
-    transactionIdOrEthHashPathParam:
-      | components["schemas"]["EthereumHash"]
-      | components["schemas"]["TransactionIdStr"];
+    transactionIdOrEthHashPathParam: string;
   };
 }
 
@@ -1888,6 +2157,33 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["Nfts"];
+        };
+      };
+      400: components["responses"]["InvalidParameterError"];
+      404: components["responses"]["NotFoundError"];
+    };
+  };
+  /** Returns information for all token relationships for an account. */
+  listTokenRelationshipByAccountId: {
+    parameters: {
+      path: {
+        /** Account alias or account id or evm address */
+        idOrAliasOrEvmAddress: components["parameters"]["accountIdOrAliasOrEvmAddressPathParam"];
+      };
+      query: {
+        /** The ID of the token to return information for */
+        "token.id"?: components["parameters"]["tokenIdQueryParam"];
+        /** The maximum number of items to return */
+        limit?: components["parameters"]["limitQueryParam"];
+        /** The order in which items are listed */
+        order?: components["parameters"]["orderQueryParam"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["TokenRelationshipResponse"];
         };
       };
       400: components["responses"]["InvalidParameterError"];
@@ -2073,8 +2369,8 @@ export interface operations {
   getContractById: {
     parameters: {
       path: {
-        /** The ID or hex encoded EVM address associated with this contract. */
-        contractIdOrAddress: components["parameters"]["contractIdPathParam"];
+        /** The ID or hex encoded EVM address (with or without 0x prefix) associated with this contract. */
+        contractIdOrAddress: components["parameters"]["contractIdOrAddressPathParam"];
       };
       query: {
         /** The consensus timestamp in seconds.nanoseconds format with an optional comparison operator */
@@ -2096,8 +2392,8 @@ export interface operations {
   listContractResults: {
     parameters: {
       path: {
-        /** The ID or hex encoded EVM address associated with this contract. */
-        contractIdOrAddress: components["parameters"]["contractIdPathParam"];
+        /** The ID or hex encoded EVM address (with or without 0x prefix) associated with this contract. */
+        contractIdOrAddress: components["parameters"]["contractIdOrAddressPathParam"];
       };
       query: {
         /** Account ID or EVM address executing the contract */
@@ -2128,12 +2424,39 @@ export interface operations {
       400: components["responses"]["InvalidParameterError"];
     };
   };
+  /** Returns a list of all contract's slots. */
+  listContractState: {
+    parameters: {
+      path: {
+        /** The ID or hex encoded EVM address (with or without 0x prefix) associated with this contract. */
+        contractIdOrAddress: components["parameters"]["contractIdOrAddressPathParam"];
+      };
+      query: {
+        /** The slot's number */
+        slot?: components["parameters"]["slotQueryParam"];
+        /** The order in which items are listed */
+        order?: components["parameters"]["orderQueryParam"];
+        /** The maximum number of items to return */
+        limit?: components["parameters"]["limitQueryParam"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["ContractStateResponse"];
+        };
+      };
+      400: components["responses"]["InvalidParameterError"];
+      404: components["responses"]["NotFoundError"];
+    };
+  };
   /** Returns a single ContractResult for a contract's function executions at a specific timestamp. */
   getContractResultByIdAndTimestamp: {
     parameters: {
       path: {
-        /** The ID or hex encoded EVM address associated with this contract. */
-        contractIdOrAddress: components["parameters"]["contractIdPathParam"];
+        /** The ID or hex encoded EVM address (with or without 0x prefix) associated with this contract. */
+        contractIdOrAddress: components["parameters"]["contractIdOrAddressPathParam"];
         /** The timestamp at which the associated transaction reached consensus */
         timestamp: components["parameters"]["timestampPathParam"];
       };
@@ -2216,6 +2539,33 @@ export interface operations {
       404: components["responses"]["NotFoundError"];
     };
   };
+  /** Returns a list of ContractActions for a contract's function executions for a given transactionId or ethereum transaction hash. */
+  getContractActionsByTransactionIdOrHash: {
+    parameters: {
+      path: {
+        /** Transaction Id or a 32 byte hash with optional 0x prefix */
+        transactionIdOrHash: components["parameters"]["transactionIdOrEthHashPathParam"];
+      };
+      query: {
+        /** The index of a contract action */
+        index?: components["parameters"]["contractActionsIndexQueryParam"];
+        /** The maximum number of items to return */
+        limit?: components["parameters"]["limitQueryParam"];
+        /** The order in which items are listed */
+        order?: components["parameters"]["orderQueryParam"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["ContractActionsResponse"];
+        };
+      };
+      400: components["responses"]["InvalidParameterError"];
+      404: components["responses"]["NotFoundError"];
+    };
+  };
   /**
    * Search the logs of a specific contract across multiple contract calls. Chained logs are not
    * included but can be found by calling `/api/v1/contracts/{contractId}/results/{timestamp}`
@@ -2249,8 +2599,8 @@ export interface operations {
   listContractLogs: {
     parameters: {
       path: {
-        /** The ID or hex encoded EVM address associated with this contract. */
-        contractIdOrAddress: components["parameters"]["contractIdPathParam"];
+        /** The ID or hex encoded EVM address (with or without 0x prefix) associated with this contract. */
+        contractIdOrAddress: components["parameters"]["contractIdOrAddressPathParam"];
       };
       query: {
         /** Contract log index */
