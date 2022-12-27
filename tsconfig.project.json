@@ -17,6 +17,9 @@
         },
         {
             "path": "./packages/hapi-connect"
+        },
+        {
+            "path": "./packages/hapi-mempool"
         }
     ],
     "files": []

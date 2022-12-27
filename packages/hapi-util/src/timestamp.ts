@@ -13,6 +13,10 @@ export function timestamp_to_keyString(timestamp: Timestamp | undefined): Timest
     return EmptyTimestampKeyString;
 }
 
+export function timestamp_to_date(timestamp: Timestamp): Date {
+    return new Date(timestamp.seconds * 1000 + timestamp.nanos / 1000000.0);
+}
+
 export function date_to_keyString(date: Date | undefined): TimestampKeyString {
 	if (date) {
 		const miliseconds = date.getTime();

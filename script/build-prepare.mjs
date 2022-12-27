@@ -8,6 +8,7 @@ prepareHapiProto();
 prepareHapiUtil();
 prepareHapiMirror();
 prepareHapiConnect();
+prepareHapiMempool();
 
 function prepareHapiProto() {
     const projDir = path.join(rootDir, 'packages', 'hapi-proto');
@@ -51,6 +52,14 @@ function prepareHapiMirror() {
 
 function prepareHapiConnect() {
     const projDir = path.join(rootDir, 'packages', 'hapi-connect');
+    const libDir = path.join(projDir, 'lib');
+
+    fs.rmSync(libDir, { recursive: true, force: true });
+    fs.rmSync(path.join(projDir, 'tsconfig.tsbuildinfo'), { force: true });
+}
+
+function prepareHapiMempool() {
+    const projDir = path.join(rootDir, 'packages', 'hapi-mempool');
     const libDir = path.join(projDir, 'lib');
 
     fs.rmSync(libDir, { recursive: true, force: true });
