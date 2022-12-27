@@ -1,22 +1,10 @@
-import type { AccountID, ContractID, Timestamp, TokenID, TopicID, TransactionID } from '@bugbytes/hapi-proto';
+import type { AccountID, ContractID, Timestamp, TokenID, TokenInfo, TopicID, TransactionID } from '@bugbytes/hapi-proto';
 import { accountID_to_keyString, contractID_to_keyString, tokenID_to_keyString, keyString_to_transactionID, type EntityIdKeyString, type TransactionIdKeyString, transactionID_to_mirrorKeyString, topicID_to_keyString, TimestampKeyString, timestamp_to_keyString } from '@bugbytes/hapi-util';
 import { MirrorError } from './mirror-error';
 import type { components } from './openapi';
+import { AccountInfo, ContractInfo, ContractResult, MessageInfo, NftIterator, NodeInfoIterator, TokenBalanceInfo, TokenRelationshipIterator, TransactionInfo } from './types';
 
-export type NodeInfo = components["schemas"]["NetworkNode"];
-export type NodeInfoIterator = AsyncGenerator<NodeInfo, void, unknown>;
-export type ContractInfo = components["schemas"]["Contract"];
-export type AccountInfo = components["schemas"]["AccountInfo"];
-export type TokenInfo = components["schemas"]["TokenInfo"];
-export type ContractResult = components["schemas"]["ContractResult"];
-export type MessageInfo = components["schemas"]["TopicMessage"];
-export type TransactionInfo = components["schemas"]["Transaction"];
-export type TokenBalanceInfo = { timestamp: TimestampKeyString, account: EntityIdKeyString, token: EntityIdKeyString, balance: number };
-export type TokenRelationship = components["schemas"]["TokenRelationship"]
-export type TokenRelationshipIterator = AsyncGenerator<TokenRelationship, void, unknown>;
-export type Nft = components["schemas"]["Nft"]
-export type NftIterator = AsyncGenerator<Nft, void, unknown>;
-
+// Types Only Seen Internally to this Module
 type NodeInfoListResponse = components["schemas"]["NetworkNodesResponse"];
 type MessageInfoListResponse = components["schemas"]["TopicMessagesResponse"];
 type TokenBalanceListResponse = components["schemas"]["TokenBalancesResponse"];
@@ -48,6 +36,20 @@ export class MirrorRestClient {
 			}
 			path = payload.links.next || '';
 		}
+	}
+
+	async getTransaction(transactionId: TransactionIdKeyString | TransactionID ): Promise<TransactionInfo> {
+		const txKey = (typeof transactionId === 'string') ? keyString_to_transactionID(transactionId) : transactionId;
+		const path = `/api/v1/transactions/${transactionID_to_mirrorKeyString(txKey)}`;
+		const response = await fetch(this.mirrorHostname + path);
+		if (!response.ok) {
+			throw new MirrorError(response.statusText, response.status);
+		}
+		const payload = await response.json() as TransactionsListResponse;
+		if (payload.transactions && payload.transactions.length > 0) {
+			return payload.transactions[0];
+		}
+		throw new MirrorError('Transaction not found.', 400);		
 	}
 
 	async getLatestTransaction(): Promise<TransactionInfo> {

@@ -1,21 +1,21 @@
 {
-  "name": "@bugbytes/hapi-mirror",
+  "name": "@bugbytes/hapi-mempool",
   "version": "0.31.8",
-  "description": "Hedera Mirror Node Client",
+  "description": "Hedera Mempool Client",
   "main": "./lib/index.js",
   "exports": "./lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
-    "directory": "packages/hapi-mirror",
+    "directory": "packages/hapi-mempool",
     "type": "git",
     "url": "git+https://github.com/bugbytesinc/hapi-proto.git"
   },
   "keywords": [
     "Hashgraph",
     "HAPI",
-    "Mirror"
+    "Mempool"
   ],
   "author": "BugBytes, Inc.",
   "license": "MIT",

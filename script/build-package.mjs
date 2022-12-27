@@ -8,6 +8,7 @@ copyPackageJsonFile('hapi-proto');
 copyPackageJsonFile('hapi-util');
 copyPackageJsonFile('hapi-mirror');
 copyPackageJsonFile('hapi-connect');
+copyPackageJsonFile('hapi-mempool');
 
 function copyPackageJsonFile(project) {
     const projDir = path.join(rootDir, 'packages', project);
@@ -15,5 +16,6 @@ function copyPackageJsonFile(project) {
     const pkg = JSON.parse(fs.readFileSync(path.join(projDir, 'package.json'), 'utf-8'));
     pkg['main'] = './index.js';
     pkg['exports'] = './index.js';
-    fs.writeFileSync(path.join(libDir, 'package.json'), JSON.stringify(pkg, null, 2), 'utf-8');
+    fs.writeFileSync(path.join(libDir, 'package.json'), JSON.stringify(pkg, null, 2), 'utf-8');  
+    fs.copyFileSync(path.join(projDir, 'README.md'), path.join(libDir, 'README.md'));
 }
