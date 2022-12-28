@@ -1,6 +1,6 @@
 {
   "name": "@bugbytes/hapi-mempool",
-  "version": "0.31.8",
+  "version": "0.31.9",
   "description": "Hedera Mempool Client",
   "main": "./lib/index.js",
   "exports": "./lib/index.js",
@@ -24,8 +24,8 @@
   },
   "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
   "peerDependencies": {
-    "@bugbytes/hapi-proto": "0.31.8",
-    "@bugbytes/hapi-util": "0.31.8",
+    "@bugbytes/hapi-proto": "0.31.9",
+    "@bugbytes/hapi-util": "0.31.9",
     "long": ">=5.2.0",
     "protobufjs": ">=7.1.2"
   }
