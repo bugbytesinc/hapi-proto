@@ -1,8 +1,8 @@
-import type { AccountID, ContractID, Timestamp, TokenID, TokenInfo, TopicID, TransactionID } from '@bugbytes/hapi-proto';
+import type { AccountID, ContractID, Timestamp, TokenID, TopicID, TransactionID } from '@bugbytes/hapi-proto';
 import { accountID_to_keyString, contractID_to_keyString, tokenID_to_keyString, keyString_to_transactionID, type EntityIdKeyString, type TransactionIdKeyString, transactionID_to_mirrorKeyString, topicID_to_keyString, TimestampKeyString, timestamp_to_keyString } from '@bugbytes/hapi-util';
 import { MirrorError } from './mirror-error';
 import type { components } from './openapi';
-import { AccountInfo, ContractInfo, ContractResult, MessageInfo, NftIterator, NodeInfoIterator, TokenBalanceInfo, TokenRelationshipIterator, TransactionInfo } from './types';
+import { AccountInfo, ContractInfo, ContractResult, MessageInfo, NftIterator, NodeInfoIterator, TokenBalanceInfo, TokenInfo, TokenRelationshipIterator, TransactionInfo } from './types';
 
 // Types Only Seen Internally to this Module
 type NodeInfoListResponse = components["schemas"]["NetworkNodesResponse"];
