@@ -3,11 +3,7 @@ import { type TransactionResponse } from "./transaction-response";
 import { ConnectionInfo } from "./connection-info";
 import { PairRequest } from "./pair-request";
 import type { KnownNetwork } from "./wallet-metadata";
-declare global {
-  interface Crypto {
-    randomUUID: () => string;
-  }
-}
+import { createRandomId } from "./util";
 
 export const DEFAULT_CACHE_KEY = "hashconnect.data";
 
@@ -21,8 +17,8 @@ export class HashConnectCachedClient {
     const value = localStorage.getItem(cacheKey);
     const connection = !!value ? JSON.parse(value) as ConnectionInfo : {} as ConnectionInfo;
     if (!connection.topic || !connection.secret || !connection.pairedWallet) {
-      connection.topic = crypto.randomUUID();
-      connection.secret = crypto.randomUUID();
+      connection.topic = createRandomId();
+      connection.secret = createRandomId();
       connection.pairedWallet = undefined;
       localStorage.setItem(cacheKey, JSON.stringify(connection));
     }
@@ -58,8 +54,8 @@ export class HashConnectCachedClient {
 
   closeWallet(): void {
     if (this._connection.pairedWallet) {
-      this._connection.topic = crypto.randomUUID();
-      this._connection.secret = crypto.randomUUID();
+      this._connection.topic = createRandomId();
+      this._connection.secret = createRandomId();
       this._connection.pairedWallet = undefined;
       localStorage?.setItem(this._cacheKey, JSON.stringify(this._connection));
       this._client = new HashConnectClient();

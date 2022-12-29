@@ -5,12 +5,8 @@ import { Relay } from "./relay";
 import { RelayMessage } from "./relay-message";
 import { TransactionResponse } from "./transaction-response";
 import { AdditionalAccountResponse } from "./additional-account-response";
+import { createRandomId } from "./util";
 
-declare global {
-  interface Crypto {
-    randomUUID: () => string;
-  }
-}
 declare type Handler = (value: RelayMessage) => boolean;
 
 export class HashConnectClient {
@@ -68,7 +64,7 @@ export class HashConnectClient {
     accountToSign: string,
     returnTransaction = false
   ): Promise<TransactionResponse> {
-    const id = crypto.randomUUID();
+    const id = createRandomId();
     this.send(topic, "Transaction", {
       id,
       topic,
@@ -96,7 +92,7 @@ export class HashConnectClient {
     network: string,
     multiAccount: boolean
   ): Promise<AdditionalAccountResponse> {
-    const id = crypto.randomUUID();
+    const id = createRandomId();
     this.send(topic, "AdditionalAccountRequest", {
       id,
       topic,
