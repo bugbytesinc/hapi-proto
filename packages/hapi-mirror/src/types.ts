@@ -10,6 +10,7 @@ export type TokenInfo = components["schemas"]["TokenInfo"];
 export type ContractResult = components["schemas"]["ContractResult"];
 export type MessageInfo = components["schemas"]["TopicMessage"];
 export type TransactionInfo = components["schemas"]["Transaction"];
+export type TransactionDetail = components["schemas"]["TransactionDetail"];
 export type TokenBalanceInfo = { timestamp: TimestampKeyString, account: EntityIdKeyString, token: EntityIdKeyString, balance: number };
 export type TokenRelationship = components["schemas"]["TokenRelationship"]
 export type TokenRelationshipIterator = AsyncGenerator<TokenRelationship, void, unknown>;

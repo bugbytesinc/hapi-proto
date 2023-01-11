@@ -4,11 +4,12 @@
   "scripts": {
     "clean": "node script/clean.mjs",
     "build:prepare": "node script/build-prepare.mjs",
-    "build:proto": "grpc_tools_node_protoc --proto_path=packages/hapi-proto/src/proto-src --ts_proto_opt=esModuleInterop=true --ts_proto_opt=useExactTypes=false --plugin=node_modules/ts-proto/protoc-gen-ts_proto.cmd --ts_proto_opt=oneof=unions --ts_proto_out=./packages/hapi-proto/src/proto/ ./packages/hapi-proto/src/proto-src/*.proto",
+    "build:openapi": "npx openapi-typescript reference/hedera-mirror/openapi.json --output packages/hapi-mirror/src/openapi.ts",
+    "build:proto": "grpc_tools_node_protoc --proto_path=packages/hapi-proto/src/proto-src --ts_proto_opt=esModuleInterop=true --ts_proto_opt=useExactTypes=false --plugin=node_modules/ts-proto/protoc-gen-ts_proto.cmd --ts_proto_opt=oneof=unions --ts_proto_out=./packages/hapi-proto/src/proto/ ./packages/hapi-proto/src/proto-src/*.proto",    
     "build:index": "node script/build-index.mjs",
     "build:tsc": "tsc --build ./tsconfig.project.json",
     "build:package": "node script/build-package.mjs",
-    "build": "npm run build:prepare && npm run build:proto && npm run build:index && npm run build:tsc && npm run build:package",
+    "build": "npm run build:prepare && npm run build:openapi && npm run build:proto && npm run build:index && npm run build:tsc && npm run build:package",
     "build:tgz": "node script/build-tgz.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,6 +23,7 @@
     "grpc_tools_node_protoc_ts": "5.3.2",
     "grpc-tools": "1.11.3",
     "long": "^5.2.0",
+    "openapi-typescript": "^6.1.0",
     "protobufjs": "^7.1.2",
     "rxjs": "^7.5.7",
     "simple-crypto-js": "^3.0.1",

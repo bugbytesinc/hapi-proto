@@ -1,2 +1,3 @@
 lib
+src/openapi.ts
 tsconfig.tsbuildinfo

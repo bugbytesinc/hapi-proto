@@ -2,10 +2,11 @@ import {
   as_transaction_id_keystring,
   type TransactionIdKeyString,
 } from "@bugbytes/hapi-util";
-import { TransactionReceipt, type TransactionID } from "@bugbytes/hapi-proto";
+import { SignedTransaction, TransactionReceipt, type TransactionID } from "@bugbytes/hapi-proto";
 import type { TransactionInfo } from "./transaction-info";
 import { MempoolError } from "./mempool-error";
 import type { MempoolInfo } from "./mempool-info";
+import { TransactionSummary } from "./transaction-summary";
 
 export class MempoolRestClient {
   private readonly mempoolHostname: string;
@@ -19,7 +20,7 @@ export class MempoolRestClient {
       !mempoolHostname.startsWith("http://")
     ) {
       throw new Error(
-        "Invalid Mmepool Node URL, must start with https:// or http://"
+        "Invalid Memepool Node URL, must start with https:// or http://"
       );
     }
     this.mempoolHostname = mempoolHostname.endsWith("/")
@@ -32,6 +33,27 @@ export class MempoolRestClient {
       throw await MempoolError.create(response);
     }
     return (await response.json()) as MempoolInfo;
+  }
+  async getTransactions(): Promise<TransactionSummary[]> {
+    const response = await fetch(`${this.mempoolHostname}/Transactions`);
+    if (!response.ok) {
+      throw await MempoolError.create(response);
+    }
+    return (await response.json()) as TransactionSummary[];
+  }
+  async getSignedTransaction(
+    transactionId: TransactionID | TransactionIdKeyString
+  ): Promise<SignedTransaction> {
+    const response = await fetch(
+      `${this.mempoolHostname}/Transactions/${as_transaction_id_keystring(
+        transactionId
+      )}/protobuf`
+    );
+    if (!response.ok) {
+      throw await MempoolError.create(response);
+    }
+    const data = await response.arrayBuffer();
+    return SignedTransaction.decode(new Uint8Array(data));
   }
   async getTransactionStatus(
     transactionId: TransactionID | TransactionIdKeyString

@@ -27,6 +27,10 @@ export function topicID_to_keyString(token: TopicID): EntityIdKeyString {
     return `${token.shardNum}.${token.realmNum}.${token.topicNum}`;
 }
 
+export function fileID_to_keyString(token: FileID): EntityIdKeyString {
+    return `${token.shardNum}.${token.realmNum}.${token.fileNum}`;
+}
+
 export function contractID_to_keyString(contract: ContractID): EntityIdKeyString {
     switch (contract.contract?.$case) {
         case 'contractNum':
@@ -78,6 +82,14 @@ export function keyString_to_topicID(address: EntityIdKeyString): TopicID {
     const realmNum = parseInt(realm, 10);
     const topicNum = parseInt(num, 10);
     return { shardNum, realmNum, topicNum }
+}
+
+export function keyString_to_scheduleID(address: EntityIdKeyString): ScheduleID {
+    const [shard, realm, num] = address.split('.');
+    const shardNum = parseInt(shard, 10);
+    const realmNum = parseInt(realm, 10);
+    const scheduleNum = parseInt(num, 10);
+    return { shardNum, realmNum, scheduleNum }
 }
 
 export function is_entity_id(value: string): value is EntityIdKeyString {
