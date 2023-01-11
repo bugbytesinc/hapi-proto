@@ -1,21 +1,13 @@
 import type {
   EntityIdKeyString,
-  TimestampKeyString,
   TransactionIdKeyString,
 } from "@bugbytes/hapi-util";
 
-export interface TransactionInfo {
+export interface TransactionSummary {
   transaction_id: TransactionIdKeyString;
   node: EntityIdKeyString;
   duration: number;
   type: string;
   status: string;
   precheck_code: string | null;
-  signed_by: string[];
-  history: [
-    {
-      timestamp: TimestampKeyString;
-      description: string;
-    }
-  ];
 }

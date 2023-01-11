@@ -2,13 +2,14 @@ import type { AccountID, ContractID, Timestamp, TokenID, TopicID, TransactionID 
 import { accountID_to_keyString, contractID_to_keyString, tokenID_to_keyString, keyString_to_transactionID, type EntityIdKeyString, type TransactionIdKeyString, transactionID_to_mirrorKeyString, topicID_to_keyString, TimestampKeyString, timestamp_to_keyString } from '@bugbytes/hapi-util';
 import { MirrorError } from './mirror-error';
 import type { components } from './openapi';
-import { AccountInfo, ContractInfo, ContractResult, MessageInfo, NftIterator, NodeInfoIterator, TokenBalanceInfo, TokenInfo, TokenRelationshipIterator, TransactionInfo } from './types';
+import { AccountInfo, ContractInfo, ContractResult, MessageInfo, NftIterator, NodeInfoIterator, TokenBalanceInfo, TokenInfo, TokenRelationshipIterator, TransactionDetail, TransactionInfo } from './types';
 
 // Types Only Seen Internally to this Module
 type NodeInfoListResponse = components["schemas"]["NetworkNodesResponse"];
 type MessageInfoListResponse = components["schemas"]["TopicMessagesResponse"];
 type TokenBalanceListResponse = components["schemas"]["TokenBalancesResponse"];
 type TransactionsListResponse = components["schemas"]["TransactionsResponse"];
+type TransactionByIdResponse = components["schemas"]["TransactionByIdResponse"];
 type TokenRelationshipListResponse = components["schemas"]["TokenRelationshipResponse"];
 type NftListResponse = components["schemas"]["Nfts"];
 
@@ -38,14 +39,14 @@ export class MirrorRestClient {
 		}
 	}
 
-	async getTransaction(transactionId: TransactionIdKeyString | TransactionID ): Promise<TransactionInfo> {
+	async getTransaction(transactionId: TransactionIdKeyString | TransactionID ): Promise<TransactionDetail> {
 		const txKey = (typeof transactionId === 'string') ? keyString_to_transactionID(transactionId) : transactionId;
 		const path = `/api/v1/transactions/${transactionID_to_mirrorKeyString(txKey)}`;
 		const response = await fetch(this.mirrorHostname + path);
 		if (!response.ok) {
 			throw new MirrorError(response.statusText, response.status);
 		}
-		const payload = await response.json() as TransactionsListResponse;
+		const payload = await response.json() as TransactionByIdResponse;
 		if (payload.transactions && payload.transactions.length > 0) {
 			return payload.transactions[0];
 		}
