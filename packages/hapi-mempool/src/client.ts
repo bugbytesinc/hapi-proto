@@ -84,7 +84,7 @@ export class MempoolRestClient {
   }
   async submitTransaction(
     signedTransactionBytes: Uint8Array
-  ): Promise<Uint8Array> {
+  ): Promise<SignedTransaction> {
     const options = {
       method: "POST",
       headers: {
@@ -101,6 +101,30 @@ export class MempoolRestClient {
       throw await MempoolError.create(response);
     }
     const data = await response.arrayBuffer();
-    return new Uint8Array(data);
+    return SignedTransaction.decode(new Uint8Array(data));
+  }
+  async addSignatures(
+    transactionId: TransactionID | TransactionIdKeyString,
+    signatureMapBytes: Uint8Array
+  ): Promise<SignedTransaction> {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/octet-stream",
+        Accept: "application/octet-stream",
+      },
+      body: signatureMapBytes,
+    };
+    const response = await fetch(
+      `${this.mempoolHostname}/Transactions/${as_transaction_id_keystring(
+        transactionId
+      )}/signatures`,
+      options
+    );
+    if (!response.ok) {
+      throw await MempoolError.create(response);
+    }
+    const data = await response.arrayBuffer();
+    return SignedTransaction.decode(new Uint8Array(data));
   }
 }
