@@ -8,7 +8,7 @@ copyPackageJsonFile('hapi-proto');
 copyPackageJsonFile('hapi-util');
 copyPackageJsonFile('hapi-mirror');
 copyPackageJsonFile('hapi-connect');
-copyPackageJsonFile('hapi-mempool');
+copyPackageJsonFile('hapi-hashpool');
 
 function copyPackageJsonFile(project) {
     const projDir = path.join(rootDir, 'packages', project);

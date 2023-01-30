@@ -4,40 +4,40 @@ import {
 } from "@bugbytes/hapi-util";
 import { SignedTransaction, TransactionReceipt, type TransactionID } from "@bugbytes/hapi-proto";
 import type { TransactionInfo } from "./transaction-info";
-import { MempoolError } from "./mempool-error";
-import type { MempoolInfo } from "./mempool-info";
+import { HashpoolError } from "./hashpool-error";
+import type { HashpoolInfo } from "./hashpool-info";
 import { TransactionSummary } from "./transaction-summary";
 
-export class MempoolRestClient {
-  private readonly mempoolHostname: string;
+export class HashpoolRestClient {
+  private readonly hashpoolHostname: string;
 
-  constructor(mempoolHostname: string) {
-    if (!mempoolHostname) {
-      throw new Error("Mempool Node URL is required.");
+  constructor(hashpoolHostname: string) {
+    if (!hashpoolHostname) {
+      throw new Error("Hashpool Node URL is required.");
     }
     if (
-      !mempoolHostname.startsWith("https://") &&
-      !mempoolHostname.startsWith("http://")
+      !hashpoolHostname.startsWith("https://") &&
+      !hashpoolHostname.startsWith("http://")
     ) {
       throw new Error(
         "Invalid Memepool Node URL, must start with https:// or http://"
       );
     }
-    this.mempoolHostname = mempoolHostname.endsWith("/")
-      ? mempoolHostname.substring(0, mempoolHostname.length - 1)
-      : mempoolHostname;
+    this.hashpoolHostname = hashpoolHostname.endsWith("/")
+      ? hashpoolHostname.substring(0, hashpoolHostname.length - 1)
+      : hashpoolHostname;
   }
-  async getInfo(): Promise<MempoolInfo> {
-    const response = await fetch(`${this.mempoolHostname}/Info`);
+  async getInfo(): Promise<HashpoolInfo> {
+    const response = await fetch(`${this.hashpoolHostname}/Info`);
     if (!response.ok) {
-      throw await MempoolError.create(response);
+      throw await HashpoolError.create(response);
     }
-    return (await response.json()) as MempoolInfo;
+    return (await response.json()) as HashpoolInfo;
   }
   async getTransactions(): Promise<TransactionSummary[]> {
-    const response = await fetch(`${this.mempoolHostname}/Transactions`);
+    const response = await fetch(`${this.hashpoolHostname}/Transactions`);
     if (!response.ok) {
-      throw await MempoolError.create(response);
+      throw await HashpoolError.create(response);
     }
     return (await response.json()) as TransactionSummary[];
   }
@@ -45,12 +45,12 @@ export class MempoolRestClient {
     transactionId: TransactionID | TransactionIdKeyString
   ): Promise<SignedTransaction> {
     const response = await fetch(
-      `${this.mempoolHostname}/Transactions/${as_transaction_id_keystring(
+      `${this.hashpoolHostname}/Transactions/${as_transaction_id_keystring(
         transactionId
       )}/protobuf`
     );
     if (!response.ok) {
-      throw await MempoolError.create(response);
+      throw await HashpoolError.create(response);
     }
     const data = await response.arrayBuffer();
     return SignedTransaction.decode(new Uint8Array(data));
@@ -59,12 +59,12 @@ export class MempoolRestClient {
     transactionId: TransactionID | TransactionIdKeyString
   ): Promise<TransactionInfo> {
     const response = await fetch(
-      `${this.mempoolHostname}/Transactions/${as_transaction_id_keystring(
+      `${this.hashpoolHostname}/Transactions/${as_transaction_id_keystring(
         transactionId
       )}`
     );
     if (!response.ok) {
-      throw await MempoolError.create(response);
+      throw await HashpoolError.create(response);
     }
     return (await response.json()) as TransactionInfo;
   }
@@ -72,12 +72,12 @@ export class MempoolRestClient {
     transactionId: TransactionID | TransactionIdKeyString
   ): Promise<TransactionReceipt> {
     const response = await fetch(
-      `${this.mempoolHostname}/Transactions/${as_transaction_id_keystring(
+      `${this.hashpoolHostname}/Transactions/${as_transaction_id_keystring(
         transactionId
       )}/receipt`
     );
     if (!response.ok) {
-      throw await MempoolError.create(response);
+      throw await HashpoolError.create(response);
     }
     const data = await response.arrayBuffer();
     return TransactionReceipt.decode(new Uint8Array(data));
@@ -94,11 +94,11 @@ export class MempoolRestClient {
       body: signedTransactionBytes,
     };
     const response = await fetch(
-      `${this.mempoolHostname}/Transactions`,
+      `${this.hashpoolHostname}/Transactions`,
       options
     );
     if (!response.ok) {
-      throw await MempoolError.create(response);
+      throw await HashpoolError.create(response);
     }
     const data = await response.arrayBuffer();
     return SignedTransaction.decode(new Uint8Array(data));
@@ -116,13 +116,13 @@ export class MempoolRestClient {
       body: signatureMapBytes,
     };
     const response = await fetch(
-      `${this.mempoolHostname}/Transactions/${as_transaction_id_keystring(
+      `${this.hashpoolHostname}/Transactions/${as_transaction_id_keystring(
         transactionId
       )}/signatures`,
       options
     );
     if (!response.ok) {
-      throw await MempoolError.create(response);
+      throw await HashpoolError.create(response);
     }
     const data = await response.arrayBuffer();
     return SignedTransaction.decode(new Uint8Array(data));

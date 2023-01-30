@@ -1,11 +1,11 @@
-export class MempoolError extends Error {
+export class HashpoolError extends Error {
   public readonly title: string;
   public readonly status: number;
   public readonly traceId: string;
 
-  static async create(response: Response): Promise<MempoolError> {
+  static async create(response: Response): Promise<HashpoolError> {
     const problemDetails = await response.json();
-    return new MempoolError(problemDetails);
+    return new HashpoolError(problemDetails);
   }
 
   private constructor(problemDetails: any) {
