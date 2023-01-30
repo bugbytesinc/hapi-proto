@@ -48,10 +48,10 @@ backwards compatible until stability in design and features is achieved.
   `@bugbytes/hapi-proto`, `@bugbytes/hapi-util`, `long`, `protobufjs`, `simple-crypto-js` 
   and `ts-typed-events`.
 
-* **MEMPOOL** [@bugbytes/hapi-mempool](./packages/hapi-mempool/README.md)  
+* **HASHPOOL** [@bugbytes/hapi-hashpool](./packages/hapi-hashpool/README.md)  
 
   This project provides a helper client for interacting with the experimental 
-  Mempool REST server, a REST front-end for submitting raw (possibly partially) signed 
+  Hashpool REST server, a REST front-end for submitting raw (possibly partially) signed 
   protobuf HAPI transactions which are then temporarily held in state and submitted to the 
   appropriate Hedera Gossip Node via native gRPC protocol at the proper submission time.  
   The implementation requires the following peer dependencies:  `@bugbytes/hapi-proto`, 

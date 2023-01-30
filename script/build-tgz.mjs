@@ -14,7 +14,7 @@ makeTgz('hapi-proto');
 makeTgz('hapi-util');
 makeTgz('hapi-mirror');
 makeTgz('hapi-connect');
-makeTgz('hapi-mempool');
+makeTgz('hapi-hashpool');
 
 function makeTgz(project) {
 

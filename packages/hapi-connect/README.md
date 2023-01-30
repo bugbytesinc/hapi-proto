@@ -1,4 +1,4 @@
-# HAPI Mempool Client
+# HAPI HashConnect Client
 
 > *This is an Experimental Project, the creators make no assertion of future 
 > maintanance or support.  We suggest you do not use this package at this time, 

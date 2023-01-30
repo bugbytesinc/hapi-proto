@@ -1,21 +1,21 @@
 {
-  "name": "@bugbytes/hapi-mempool",
-  "version": "0.31.12",
-  "description": "Hedera Mempool Client",
+  "name": "@bugbytes/hapi-hashpool",
+  "version": "0.31.13",
+  "description": "Hedera Hashpool Client",
   "main": "./lib/index.js",
   "exports": "./lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
-    "directory": "packages/hapi-mempool",
+    "directory": "packages/hapi-hashpool",
     "type": "git",
     "url": "git+https://github.com/bugbytesinc/hapi-proto.git"
   },
   "keywords": [
     "Hashgraph",
     "HAPI",
-    "Mempool"
+    "Hashpool"
   ],
   "author": "BugBytes, Inc.",
   "license": "MIT",
@@ -24,8 +24,8 @@
   },
   "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
   "peerDependencies": {
-    "@bugbytes/hapi-proto": "0.31.12",
-    "@bugbytes/hapi-util": "0.31.12",
+    "@bugbytes/hapi-proto": "0.31.13",
+    "@bugbytes/hapi-util": "0.31.13",
     "long": ">=5.2.0",
     "protobufjs": ">=7.1.2"
   }

@@ -19,7 +19,7 @@
             "path": "./packages/hapi-connect"
         },
         {
-            "path": "./packages/hapi-mempool"
+            "path": "./packages/hapi-hashpool"
         }
     ],
     "files": []

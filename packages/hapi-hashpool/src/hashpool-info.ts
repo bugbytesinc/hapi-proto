@@ -1,7 +1,7 @@
 import type { TimestampKeyString } from "@bugbytes/hapi-util";
 import type { ChannelInfo } from "./channel-info";
 
-export interface MempoolInfo {
+export interface HashpoolInfo {
   mirror_node: string;
   channels: ChannelInfo[];
   timestamp: TimestampKeyString;
