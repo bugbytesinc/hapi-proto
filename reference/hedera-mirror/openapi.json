@@ -49,11 +49,20 @@
     "/api/v1/accounts/{idOrAliasOrEvmAddress}": {
       "get": {
         "summary": "Get account by alias, id, or evm address",
-        "description": "Return the account transactions and balance information given an account alias, an account id, or an evm address\n",
+        "description": "Return the account transactions and balance information given an account alias, an account id, or an evm address. The information will be limited to at most 1000 token balances for the account as outlined in HIP-367.\n",
         "operationId": "getAccountByIdOrAliasOrEvmAddress",
         "parameters": [
           {
             "$ref": "#/components/parameters/accountIdOrAliasOrEvmAddressPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/limitQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/orderQueryParamDesc"
+          },
+          {
+            "$ref": "#/components/parameters/timestampQueryParam"
           },
           {
             "$ref": "#/components/parameters/transactionTypeQueryParam"
@@ -92,7 +101,10 @@
             "$ref": "#/components/parameters/accountIdOrAliasOrEvmAddressPathParam"
           },
           {
-            "$ref": "#/components/parameters/tokenIdQueryParam"
+            "$ref": "#/components/parameters/limitQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/orderQueryParamDesc"
           },
           {
             "$ref": "#/components/parameters/serialNumberQueryParam"
@@ -101,10 +113,7 @@
             "$ref": "#/components/parameters/spenderIdQueryParam"
           },
           {
-            "$ref": "#/components/parameters/limitQueryParam"
-          },
-          {
-            "$ref": "#/components/parameters/orderQueryParamDesc"
+            "$ref": "#/components/parameters/tokenIdQueryParam"
           }
         ],
         "responses": {
@@ -182,13 +191,13 @@
             "$ref": "#/components/parameters/accountIdOrAliasOrEvmAddressPathParam"
           },
           {
-            "$ref": "#/components/parameters/tokenIdQueryParam"
-          },
-          {
             "$ref": "#/components/parameters/limitQueryParam"
           },
           {
             "$ref": "#/components/parameters/orderQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/tokenIdQueryParam"
           }
         ],
         "responses": {
@@ -224,13 +233,13 @@
             "$ref": "#/components/parameters/accountIdOrAliasOrEvmAddressPathParam"
           },
           {
-            "$ref": "#/components/parameters/spenderIdQueryParam"
-          },
-          {
             "$ref": "#/components/parameters/limitQueryParam"
           },
           {
             "$ref": "#/components/parameters/orderQueryParamDesc"
+          },
+          {
+            "$ref": "#/components/parameters/spenderIdQueryParam"
           }
         ],
         "responses": {
@@ -266,16 +275,16 @@
             "$ref": "#/components/parameters/accountIdOrAliasOrEvmAddressPathParam"
           },
           {
-            "$ref": "#/components/parameters/spenderIdQueryParam"
-          },
-          {
-            "$ref": "#/components/parameters/tokenIdQueryParam"
-          },
-          {
             "$ref": "#/components/parameters/limitQueryParam"
           },
           {
             "$ref": "#/components/parameters/orderQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/spenderIdQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/tokenIdQueryParam"
           }
         ],
         "responses": {
@@ -304,7 +313,7 @@
     "/api/v1/balances": {
       "get": {
         "summary": "List account balances",
-        "description": "Returns a timestamped list of account balances on the network. This includes both HBAR and token balances for accounts.",
+        "description": "Returns a timestamped list of account balances on the network, limited to at most 50 token balances per account as outlined in HIP-367. This includes both HBAR and token balances for accounts.",
         "operationId": "listAccountBalances",
         "parameters": [
           {
@@ -314,16 +323,16 @@
             "$ref": "#/components/parameters/accountBalanceQueryParam"
           },
           {
-            "$ref": "#/components/parameters/orderQueryParamDesc"
-          },
-          {
             "$ref": "#/components/parameters/accountPublicKeyQueryParam"
           },
           {
-            "$ref": "#/components/parameters/timestampQueryParam"
+            "$ref": "#/components/parameters/limitQueryParam"
           },
           {
-            "$ref": "#/components/parameters/limitQueryParam"
+            "$ref": "#/components/parameters/orderQueryParamDesc"
+          },
+          {
+            "$ref": "#/components/parameters/timestampQueryParam"
           }
         ],
         "responses": {
@@ -356,13 +365,13 @@
             "$ref": "#/components/parameters/blockNumberQueryParam"
           },
           {
-            "$ref": "#/components/parameters/timestampQueryParam"
+            "$ref": "#/components/parameters/limitQueryParam"
           },
           {
             "$ref": "#/components/parameters/orderQueryParamDesc"
           },
           {
-            "$ref": "#/components/parameters/limitQueryParam"
+            "$ref": "#/components/parameters/timestampQueryParam"
           }
         ],
         "responses": {
@@ -500,7 +509,16 @@
             "$ref": "#/components/parameters/contractIdOrAddressPathParam"
           },
           {
+            "$ref": "#/components/parameters/blockHashQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/contractsBlockNumberQueryParam"
+          },
+          {
             "$ref": "#/components/parameters/fromQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/internalQueryParam"
           },
           {
             "$ref": "#/components/parameters/limitQueryParam"
@@ -512,16 +530,7 @@
             "$ref": "#/components/parameters/timestampQueryParam"
           },
           {
-            "$ref": "#/components/parameters/contractsBlockNumberQueryParam"
-          },
-          {
-            "$ref": "#/components/parameters/blockHashQueryParam"
-          },
-          {
             "$ref": "#/components/parameters/transactionIndexQueryParam"
-          },
-          {
-            "$ref": "#/components/parameters/internalQueryParam"
           }
         ],
         "responses": {
@@ -554,13 +563,13 @@
             "$ref": "#/components/parameters/contractIdOrAddressPathParam"
           },
           {
-            "$ref": "#/components/parameters/slotQueryParam"
+            "$ref": "#/components/parameters/limitQueryParam"
           },
           {
             "$ref": "#/components/parameters/orderQueryParam"
           },
           {
-            "$ref": "#/components/parameters/limitQueryParam"
+            "$ref": "#/components/parameters/slotQueryParam"
           }
         ],
         "responses": {
@@ -605,7 +614,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ContractResultResponse"
+                  "$ref": "#/components/schemas/ContractResultDetails"
                 }
               }
             }
@@ -615,7 +624,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ContractResultResponse"
+                  "$ref": "#/components/schemas/ContractResultDetails"
                 }
               }
             }
@@ -642,6 +651,15 @@
             "$ref": "#/components/parameters/fromQueryParam"
           },
           {
+            "$ref": "#/components/parameters/blockHashQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/contractsBlockNumberQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/internalQueryParam"
+          },
+          {
             "$ref": "#/components/parameters/limitQueryParam"
           },
           {
@@ -651,16 +669,7 @@
             "$ref": "#/components/parameters/timestampQueryParam"
           },
           {
-            "$ref": "#/components/parameters/contractsBlockNumberQueryParam"
-          },
-          {
-            "$ref": "#/components/parameters/blockHashQueryParam"
-          },
-          {
             "$ref": "#/components/parameters/transactionIndexQueryParam"
-          },
-          {
-            "$ref": "#/components/parameters/internalQueryParam"
           }
         ],
         "responses": {
@@ -702,7 +711,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ContractResultResponse"
+                  "$ref": "#/components/schemas/ContractResultDetails"
                 }
               }
             }
@@ -712,7 +721,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ContractResultResponse"
+                  "$ref": "#/components/schemas/ContractResultDetails"
                 }
               }
             }
@@ -919,10 +928,10 @@
         "operationId": "getNetworkFees",
         "parameters": [
           {
-            "$ref": "#/components/parameters/timestampQueryParam"
+            "$ref": "#/components/parameters/orderQueryParam"
           },
           {
-            "$ref": "#/components/parameters/orderQueryParam"
+            "$ref": "#/components/parameters/timestampQueryParam"
           }
         ],
         "responses": {
@@ -961,10 +970,10 @@
             "$ref": "#/components/parameters/fileIdQueryParam"
           },
           {
-            "$ref": "#/components/parameters/nodeIdQueryParam"
+            "$ref": "#/components/parameters/limitQueryParam"
           },
           {
-            "$ref": "#/components/parameters/limitQueryParam"
+            "$ref": "#/components/parameters/nodeIdQueryParam"
           },
           {
             "$ref": "#/components/parameters/orderQueryParam"
@@ -1005,6 +1014,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidParameterError"
           },
           "404": {
             "$ref": "#/components/responses/NotFoundError"
@@ -1285,19 +1297,6 @@
             "$ref": "#/components/parameters/topicIdPathParam"
           },
           {
-            "name": "sequencenumber",
-            "in": "query",
-            "example": 2,
-            "schema": {
-              "format": "int64",
-              "minimum": 0,
-              "type": "integer"
-            }
-          },
-          {
-            "$ref": "#/components/parameters/timestampQueryParam"
-          },
-          {
             "name": "encoding",
             "in": "query",
             "example": "base64",
@@ -1310,6 +1309,19 @@
           },
           {
             "$ref": "#/components/parameters/orderQueryParamDesc"
+          },
+          {
+            "name": "sequencenumber",
+            "in": "query",
+            "example": 2,
+            "schema": {
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/timestampQueryParam"
           }
         ],
         "responses": {
@@ -1420,6 +1432,15 @@
         "operationId": "listTokens",
         "parameters": [
           {
+            "$ref": "#/components/parameters/accountIdQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/limitQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/orderQueryParam"
+          },
+          {
             "$ref": "#/components/parameters/publicKeyQueryParam"
           },
           {
@@ -1427,15 +1448,6 @@
           },
           {
             "$ref": "#/components/parameters/tokenTypeQueryParam"
-          },
-          {
-            "$ref": "#/components/parameters/limitQueryParam"
-          },
-          {
-            "$ref": "#/components/parameters/accountIdQueryParam"
-          },
-          {
-            "$ref": "#/components/parameters/orderQueryParam"
           }
         ],
         "responses": {
@@ -1646,22 +1658,22 @@
             "$ref": "#/components/parameters/tokenIdPathParam"
           },
           {
-            "$ref": "#/components/parameters/accountIdQueryParam"
-          },
-          {
             "$ref": "#/components/parameters/accountBalanceQueryParam"
           },
           {
-            "$ref": "#/components/parameters/orderQueryParam"
+            "$ref": "#/components/parameters/accountIdQueryParam"
           },
           {
             "$ref": "#/components/parameters/accountPublicKeyQueryParam"
           },
           {
-            "$ref": "#/components/parameters/timestampQueryParam"
+            "$ref": "#/components/parameters/limitQueryParam"
           },
           {
-            "$ref": "#/components/parameters/limitQueryParam"
+            "$ref": "#/components/parameters/orderQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/timestampQueryParam"
           }
         ],
         "responses": {
@@ -1701,6 +1713,9 @@
           },
           {
             "$ref": "#/components/parameters/orderQueryParamDesc"
+          },
+          {
+            "$ref": "#/components/parameters/serialNumberQueryParam"
           }
         ],
         "responses": {
@@ -1776,6 +1791,9 @@
           },
           {
             "$ref": "#/components/parameters/orderQueryParamDesc"
+          },
+          {
+            "$ref": "#/components/parameters/timestampQueryParam"
           }
         ],
         "responses": {
@@ -1853,12 +1871,12 @@
   ],
   "info": {
     "title": "Hedera Mirror Node REST API",
-    "version": "0.71.0",
+    "version": "0.76.0",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "description": "The Mirror Node REST API offers the ability to query cryptocurrency transactions and account information from a Hedera managed mirror node.\n\nAvailable versions: [v1](/api/v1/docs). Base url: [/api/v1](/api/v1)",
+    "description": "The Mirror Node REST API offers the ability to query cryptocurrency transactions and account information from a Hedera managed mirror node.\n\nBase url: [/api/v1](/api/v1)\n\nOpenAPI Spec: [/api/v1/docs/openapi.yml](/api/v1/docs/openapi.yml)",
     "contact": {
       "name": "Hedera Mirror Node Team",
       "email": "mirrornode@hedera.com",
@@ -1995,18 +2013,10 @@
           }
         }
       },
-      "ContractResultResponse": {
-        "type": "object",
-        "properties": {
-          "contracts": {
-            "$ref": "#/components/schemas/ContractResultDetails"
-          }
-        }
-      },
       "ContractResultsResponse": {
         "type": "object",
         "properties": {
-          "contracts": {
+          "results": {
             "$ref": "#/components/schemas/ContractResults"
           },
           "links": {
@@ -2095,14 +2105,6 @@
           },
           "links": {
             "$ref": "#/components/schemas/Links"
-          }
-        }
-      },
-      "NetworkStakeResponse": {
-        "type": "object",
-        "properties": {
-          "network_stake": {
-            "$ref": "#/components/schemas/NetworkStake"
           }
         }
       },
@@ -2589,6 +2591,7 @@
             "$ref": "#/components/schemas/AccountInfo"
           },
           {
+            "type": "object",
             "required": [
               "transactions",
               "links"
@@ -2966,7 +2969,7 @@
             "$ref": "#/components/schemas/EntityId"
           },
           "created_contract_ids": {
-            "description": "The network's released supply of hbars in tinybars",
+            "description": "The list of smart contracts that were created by the function call.",
             "items": {
               "$ref": "#/components/schemas/EntityId"
             },
@@ -3720,7 +3723,7 @@
           "$ref": "#/components/schemas/NetworkFee"
         }
       },
-      "NetworkStake": {
+      "NetworkStakeResponse": {
         "type": "object",
         "required": [
           "max_staking_reward_rate_per_hbar",
@@ -3786,17 +3789,17 @@
           }
         },
         "example": {
-          "max_staking_reward_rate_per_hbar": "17808,",
-          "node_reward_fee_fraction": "1.0,",
-          "stake_total": "35000000000000000,",
+          "max_staking_reward_rate_per_hbar": 17808,
+          "node_reward_fee_fraction": 1,
+          "stake_total": 35000000000000000,
           "staking_period": {
             "from": "1655164800.000000000",
             "to": "1655251200.000000000"
           },
-          "staking_period_duration": "1440,",
-          "staking_periods_stored": "365,",
-          "staking_reward_fee_fraction": "1.0,",
-          "staking_reward_rate": "100000000000,",
+          "staking_period_duration": 1440,
+          "staking_periods_stored": 365,
+          "staking_reward_fee_fraction": 1,
+          "staking_reward_rate": 100000000000,
           "staking_start_threshold": 25000000000000000
         }
       },
@@ -4045,7 +4048,7 @@
       "ScheduleSignature": {
         "type": "object",
         "properties": {
-          "consensus_timestmap": {
+          "consensus_timestamp": {
             "$ref": "#/components/schemas/Timestamp"
           },
           "public_key_prefix": {
@@ -4437,14 +4440,14 @@
         "properties": {
           "automatic_association": {
             "type": "boolean",
-            "description": "Specifies if the relationship is implicitly/explicity (true/false) associated.",
+            "description": "Specifies if the relationship is implicitly/explicitly associated.",
             "example": true,
             "nullable": false
           },
           "balance": {
             "format": "int64",
             "type": "integer",
-            "description": "For FUNGIBLE_COMMON the balance that the Account holds in the smallest denomination.NON_FUNGIBLE_UNIQUE - the number of NFTs held by the account.",
+            "description": "For FUNGIBLE_COMMON, the balance that the account holds in the smallest denomination. For NON_FUNGIBLE_UNIQUE, the number of NFTs held by the account.",
             "example": 5,
             "nullable": false
           },
@@ -5269,7 +5272,7 @@
       "balanceQueryParam": {
         "name": "balance",
         "in": "query",
-        "description": "Whether to include balance information or not",
+        "description": "Whether to include balance information or not. If included, token balances are limited to at most 50 per account as outlined in HIP-367.",
         "example": true,
         "schema": {
           "type": "boolean",
