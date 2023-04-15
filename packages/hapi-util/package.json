@@ -1,6 +1,6 @@
 {
   "name": "@bugbytes/hapi-util",
-  "version": "0.31.13",
+  "version": "0.35.0",
   "description": "Hedera API Protobuf Typescript/Javascript Utilities",
   "main": "./lib/index.js",
   "exports": "./lib/index.js",
@@ -23,10 +23,10 @@
   },
   "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
   "peerDependencies": {
-    "@bugbytes/hapi-proto": "0.31.13",
-    "@noble/ed25519": "^1.7.1",
+    "@bugbytes/hapi-proto": "0.35.0",
+    "@noble/ed25519": "^1.7.3",
     "@noble/secp256k1": "^1.7.0",
     "long": ">=5.2.0",
-    "protobufjs": ">=7.1.2"
+    "protobufjs": ">=7.2.0"
   }
 }

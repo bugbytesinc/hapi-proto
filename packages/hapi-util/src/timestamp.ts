@@ -53,3 +53,9 @@ export function keyString_to_localeDateTimeString(timestamp: TimestampKeyString)
     return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
 }
 
+export function keyString_to_isoString(timestamp: TimestampKeyString): string {
+    const [secondsAsString, nanosecondsAsString] = timestamp.split('.');
+    const seconds = parseInt(secondsAsString, 10);
+    const nanoseconds = parseInt(nanosecondsAsString, 10);
+    return new Date(seconds * 1000 + nanoseconds / 1000000.0).toISOString();
+}
