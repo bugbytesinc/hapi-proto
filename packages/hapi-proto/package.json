@@ -1,6 +1,6 @@
 {
   "name": "@bugbytes/hapi-proto",
-  "version": "0.35.0",
+  "version": "0.42.0",
   "description": "Hedera API Protobuf Typescript/Javascript Bindings",
   "main": "./lib/index.js",
   "exports": "./lib/index.js",
@@ -23,8 +23,8 @@
   },
   "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
   "peerDependencies": {
-    "long": ">=5.2.0",
-    "protobufjs": ">=7.2.0",
-    "rxjs": "^7.5.7"
+    "long": ">=5.2.3",
+    "protobufjs": ">=7.2.5",
+    "rxjs": "^7.8.1"
   }
 }

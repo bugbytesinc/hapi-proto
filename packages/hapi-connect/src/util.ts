@@ -1,5 +1,5 @@
-import * as ed from '@noble/ed25519';
+import { bytesToHex, randomBytes } from '@noble/hashes/utils';
 
 export function createRandomId() {
-    return ed.utils.bytesToHex(ed.utils.randomBytes(20));
+    return bytesToHex(randomBytes(20));
 }

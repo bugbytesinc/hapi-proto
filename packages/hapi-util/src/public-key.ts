@@ -1,5 +1,5 @@
-import * as ed from '@noble/ed25519';
 import { Key } from "@bugbytes/hapi-proto";
+import { bytesToHex, concatBytes, hexToBytes } from '@noble/hashes/utils';
 import { sequences_are_equal, sequence_starts_with } from './compare';
 
 const derEd25519PublicKeyPrefix = Uint8Array.from([0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x03, 0x21, 0x00]);
@@ -14,11 +14,11 @@ export interface PublicKeyDisplay {
 export function publicKey_to_keyString(publicKey: Key): string {
     switch (publicKey.key?.$case) {
         case "ed25519":
-            return ed.utils.bytesToHex(ed.utils.concatBytes(derEd25519PublicKeyPrefix, publicKey.key.ed25519));
+            return bytesToHex(concatBytes(derEd25519PublicKeyPrefix, publicKey.key.ed25519));
         case "ECDSASecp256k1":
-            return ed.utils.bytesToHex(ed.utils.concatBytes(derSecp256k1PublicKeyPrefix, publicKey.key.ECDSASecp256k1));
+            return bytesToHex(concatBytes(derSecp256k1PublicKeyPrefix, publicKey.key.ECDSASecp256k1));
         default:
-            return ed.utils.bytesToHex(Key.encode(publicKey).finish());
+            return bytesToHex(Key.encode(publicKey).finish());
     }
 }
 
@@ -27,14 +27,14 @@ export function publicKey_to_displayable(publicKey: Key): PublicKeyDisplay {
         case "ed25519":
             return {
                 keyType: 'ed25519',
-                keyInHex: ed.utils.bytesToHex(publicKey.key.ed25519),
-                prefixInHex: ed.utils.bytesToHex(derEd25519PublicKeyPrefix)
+                keyInHex: bytesToHex(publicKey.key.ed25519),
+                prefixInHex: bytesToHex(derEd25519PublicKeyPrefix)
             }
         case "ECDSASecp256k1":
             return {
                 keyType: 'Secp256k1',
-                keyInHex: ed.utils.bytesToHex(publicKey.key.ECDSASecp256k1),
-                prefixInHex: ed.utils.bytesToHex(derSecp256k1PublicKeyPrefix)
+                keyInHex: bytesToHex(publicKey.key.ECDSASecp256k1),
+                prefixInHex: bytesToHex(derSecp256k1PublicKeyPrefix)
             }
         default:
             return {
@@ -47,7 +47,7 @@ export function publicKey_to_displayable(publicKey: Key): PublicKeyDisplay {
 
 export function keyString_to_publicKey(value: string): Key {
     try {
-        const bytes = ed.utils.hexToBytes(value);
+        const bytes = hexToBytes(value);
         if (bytes.length === 44 && sequence_starts_with(bytes, derEd25519PublicKeyPrefix)) {
             return {
                 key: {
