@@ -49,7 +49,7 @@
     "/api/v1/accounts/{idOrAliasOrEvmAddress}": {
       "get": {
         "summary": "Get account by alias, id, or evm address",
-        "description": "Return the account transactions and balance information given an account alias, an account id, or an evm address. The information will be limited to at most 1000 token balances for the account as outlined in HIP-367.\n",
+        "description": "Return the account transactions and balance information given an account alias, an account id, or an evm address. The information will be limited to at most 1000 token balances for the account as outlined in HIP-367.\nWhen the timestamp parameter is supplied, we will return transactions and account state for the relevant timestamp query. Balance information will be accurate to within 15 minutes of the provided timestamp query.\nHistorical stake and reward information is not currently available so these fields contain current data. Historical ethereum nonce information is also currently not available and may not be the exact value at a provided timestamp.\n",
         "operationId": "getAccountByIdOrAliasOrEvmAddress",
         "parameters": [
           {
@@ -268,7 +268,7 @@
     "/api/v1/accounts/{idOrAliasOrEvmAddress}/allowances/tokens": {
       "get": {
         "summary": "Get fungible token allowances for an account",
-        "description": "Returns information for fungible token allowances for an account.\n\n## Ordering\nThe order is governed by a combination of the spender id and the token id values, with spender id being the parent column.\nThe token id value governs its order within the given spender id.\n\nNote: The default order for this API is currently ASC\n\n## Filtering\nWhen filtering there are some restrictions enforced to ensure correctness and scalability.\n\n**The table below defines the restrictions and support for the token allowances endpoint**\n\n| Query Param   | Comparison Operator | Support | Description           | Example |\n| ------------- | ------------------- | ------- | --------------------- | ------- |\n| spender.id    | eq                  | Y       | Single occurrence only. | ?spender.id=X |\n|               | ne                  | N       | | |\n|               | lt(e)               | Y       | Single occurrence only. | ?spender.id=lte:X |\n|               | gt(e)               | Y       | Single occurrence only. | ?spender.id=gte:X |\n| token.id      | eq                  | Y       | Single occurrence only. Requires the presence of a **spender.id** query | ?token.id=lt:Y |\n|               | ne                  | N       | | |\n|               | lt(e)               | Y       | Single occurrence only. Requires the presence of an **lte** or **eq** **spender.id** query | ?spender.id=lte:X&token.id=lt:Y |\n|               | gt(e)               | Y       | Single occurrence only. Requires the presence of an **gte** or **eq** **spender.id** query | ?spender.id=gte:X&token.id=gt:Y |\n\nBoth filters must be a single occurrence of **gt(e)** or **lt(e)** which provide a lower and or upper boundary for search.\n",
+        "description": "Returns information for fungible token allowances for an account.\n\n## Ordering\nThe order is governed by a combination of the spender id and the token id values, with spender id being the parent column.\nThe token id value governs its order within the given spender id.\n\nNote: The default order for this API is currently ASC\n\n## Filtering\nWhen filtering there are some restrictions enforced to ensure correctness and scalability.\n\n**The table below defines the restrictions and support for the endpoint**\n\n| Query Param   | Comparison Operator | Support | Description           | Example |\n| ------------- | ------------------- | ------- | --------------------- | ------- |\n| spender.id    | eq                  | Y       | Single occurrence only. | ?spender.id=X |\n|               | ne                  | N       | | |\n|               | lt(e)               | Y       | Single occurrence only. | ?spender.id=lte:X |\n|               | gt(e)               | Y       | Single occurrence only. | ?spender.id=gte:X |\n| token.id      | eq                  | Y       | Single occurrence only. Requires the presence of a **spender.id** query | ?token.id=lt:Y |\n|               | ne                  | N       | | |\n|               | lt(e)               | Y       | Single occurrence only. Requires the presence of an **lte** or **eq** **spender.id** query | ?spender.id=lte:X&token.id=lt:Y |\n|               | gt(e)               | Y       | Single occurrence only. Requires the presence of an **gte** or **eq** **spender.id** query | ?spender.id=gte:X&token.id=gt:Y |\n\nBoth filters must be a single occurrence of **gt(e)** or **lt(e)** which provide a lower and or upper boundary for search.\n",
         "operationId": "listTokenAllowancesByAccountId",
         "parameters": [
           {
@@ -317,7 +317,7 @@
         "operationId": "listAccountBalances",
         "parameters": [
           {
-            "$ref": "#/components/parameters/accountIdQueryParam"
+            "$ref": "#/components/parameters/accountIdOrAliasOrEvmAddressQueryParam"
           },
           {
             "$ref": "#/components/parameters/accountBalanceQueryParam"
@@ -424,6 +424,98 @@
         },
         "tags": [
           "blocks"
+        ]
+      }
+    },
+    "/api/v1/contracts/call": {
+      "post": {
+        "summary": "Invoke a smart contract",
+        "description": "\nReturns a result from EVM execution such as cost-free execution of read-only smart contract queries, gas estimation, and transient simulation of read-write operations. If `estimate` field is set to true gas estimation is executed.\n\n**The table below defines the restrictions and support for the endpoint**\n\n| Estimate         | Operation Type                                                                                               | Mirror Node Version                     |\n| -------------    | -----------------------------------------------------------------------------------------------------------  | ----------------------------------------|\n| false            | static contract state reads for non precompile functions                                                     | 0.78+                                   |\n|                  | static contract state reads for precompile functions except allowance/isApprovedForAll                       | 0.78+                                   |\n|                  | static contract state reads for precompile functions with allowance                                          | 0.79+                                   |\n|                  | static contract state reads for precompile functions with isApprovedForAll                                   | 0.81+                                   |\n|                  | non-static contract state reads for non precompile functions                                                 | 0.83+                                   |\n|                  | non-static contract state reads for precompile functions                                                     | 0.83+                                   |\n| true             | non-static contract state reads and modifications for non precompile functions except lazy account creation  | 0.83+                                   |\n|                  | non-static contract state reads and modifications for non precompile functions with lazy account creation    | Not supported                           |\n|                  | non-static contract state reads and modifications for precompile functions                                   | Not supported                           |\n\nThe operations types which are not currently supported should return 501 error status.\n",
+        "operationId": "contractsCall",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContractCallRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractCallResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported media type error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Generic error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Not implemented error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "contracts"
         ]
       }
     },
@@ -555,8 +647,8 @@
     },
     "/api/v1/contracts/{contractIdOrAddress}/state": {
       "get": {
-        "summary": "The contract current state from a contract on the network",
-        "description": "Returns a list of all contract's slots.",
+        "summary": "The contract state from a contract on the network",
+        "description": "Returns a list of all contract's slots. If no timestamp is provided, returns the current state.",
         "operationId": "listContractState",
         "parameters": [
           {
@@ -570,6 +662,9 @@
           },
           {
             "$ref": "#/components/parameters/slotQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/stateTimestampQueryParam"
           }
         ],
         "responses": {
@@ -783,7 +878,7 @@
     "/api/v1/contracts/{contractIdOrAddress}/results/logs": {
       "get": {
         "summary": "List contract logs from a contract on the network",
-        "description": "Search the logs of a specific contract across multiple contract calls. Chained logs are not\nincluded but can be found by calling `/api/v1/contracts/{contractId}/results/{timestamp}`\nor `/api/v1/contracts/results/{transactionId}`. When searching by topic a timestamp parameter must be supplied\nand span a time range of at most seven days.\n\n## Ordering\nThe order is governed by the combination of timestamp and index values. If the index param is omitted, the order is determined by the timestamp only.\n\nNote: The default order for this API is currently DESC\n\n## Filtering\nWhen filtering there are some restrictions enforced to ensure correctness and scalability.\n\n**The table below defines the restrictions and support for the token allowances endpoint**\n\n| Query Param   | Comparison Operator | Support | Description           | Example |\n| ------------- | ------------------- | ------- | --------------------- | ------- |\n| index         | eq                  | Y       | Single occurrence only. Requires the presence of timestamp | ?index=X |\n|               | ne                  | N       | | |\n|               | lt(e)               | Y       | Single occurrence only. Requires the presence of timestamp | ?index=lte:X |\n|               | gt(e)               | Y       | Single occurrence only. Requires the presence of timestamp | ?index=gte:X |\n| timestamp     | eq                  | Y       | Single occurrence only. | ?timestamp=Y\n|               | ne                  | N       | | |\n|               | lt(e)               | Y       | Single occurrence only. Optional second timestamp **gt(e)** | ?timestamp=lte:Y\n|               | gt(e)               | Y       | Single occurrence only. Optional second timestamp **lt(e)** | ?timestamp=gte:Y\n\n\nBoth filters must be a single occurrence of **gt(e)** or **lt(e)** which provide a lower and or upper boundary for search.\n",
+        "description": "Search the logs of a specific contract across multiple contract calls. Chained logs are not\nincluded but can be found by calling `/api/v1/contracts/{contractId}/results/{timestamp}`\nor `/api/v1/contracts/results/{transactionId}`. When searching by topic a timestamp parameter must be supplied\nand span a time range of at most seven days.\n\n## Ordering\nThe order is governed by the combination of timestamp and index values. If the index param is omitted, the order is determined by the timestamp only.\n\nNote: The default order for this API is currently DESC\n\n## Filtering\nWhen filtering there are some restrictions enforced to ensure correctness and scalability.\n\n**The table below defines the restrictions and support for the endpoint**\n\n| Query Param   | Comparison Operator | Support | Description           | Example |\n| ------------- | ------------------- | ------- | --------------------- | ------- |\n| index         | eq                  | Y       | Single occurrence only. Requires the presence of timestamp | ?index=X |\n|               | ne                  | N       | | |\n|               | lt(e)               | Y       | Single occurrence only. Requires the presence of timestamp | ?index=lte:X |\n|               | gt(e)               | Y       | Single occurrence only. Requires the presence of timestamp | ?index=gte:X |\n| timestamp     | eq                  | Y       | Single occurrence only. | ?timestamp=Y\n|               | ne                  | N       | | |\n|               | lt(e)               | Y       | Single occurrence only. Optional second timestamp **gt(e)** | ?timestamp=lte:Y\n|               | gt(e)               | Y       | Single occurrence only. Optional second timestamp **lt(e)** | ?timestamp=gte:Y\n\n\nBoth filters must be a single occurrence of **gt(e)** or **lt(e)** which provide a lower and or upper boundary for search.\n",
         "operationId": "listContractLogs",
         "parameters": [
           {
@@ -837,7 +932,7 @@
     "/api/v1/contracts/results/logs": {
       "get": {
         "summary": "List contracts logs across many contracts on the network",
-        "description": "Search the logs across many contracts with multiple contract calls. Chained logs are not\nincluded but can be found by calling `/api/v1/contracts/{contractId}/results/{timestamp}`\nor `/api/v1/contracts/results/{transactionId}`. When searching by topic a timestamp parameter must be supplied\nand span a time range of at most seven days.\n\n## Ordering\nThe order is governed by the combination of timestamp and index values. If the index param is omitted, the order is determined by the timestamp only.\n\nNote: The default order for this API is currently DESC\n\n## Filtering\nWhen filtering there are some restrictions enforced to ensure correctness and scalability.\n\n**The table below defines the restrictions and support for the token allowances endpoint**\n\n| Query Param   | Comparison Operator | Support | Description           | Example |\n| ------------- | ------------------- | ------- | --------------------- | ------- |\n| index         | eq                  | Y       | Single occurrence only. Requires the presence of timestamp | ?index=X |\n|               | ne                  | N       | | |\n|               | lt(e)               | Y       | Single occurrence only. Requires the presence of timestamp | ?index=lte:X |\n|               | gt(e)               | Y       | Single occurrence only. Requires the presence of timestamp | ?index=gte:X |\n| timestamp     | eq                  | Y       | Single occurrence only. | ?timestamp=Y\n|               | ne                  | N       | | |\n|               | lt(e)               | Y       | Single occurrence only. Optional second timestamp **gt(e)** | ?timestamp=lte:Y\n|               | gt(e)               | Y       | Single occurrence only. Optional second timestamp **lt(e)** | ?timestamp=gte:Y\n\n\nBoth filters must be a single occurrence of **gt(e)** or **lt(e)** which provide a lower and or upper boundary for search.\n",
+        "description": "Search the logs across many contracts with multiple contract calls. Chained logs are not\nincluded but can be found by calling `/api/v1/contracts/{contractId}/results/{timestamp}`\nor `/api/v1/contracts/results/{transactionId}`. When searching by topic a timestamp parameter must be supplied\nand span a time range of at most seven days.\n\n## Ordering\nThe order is governed by the combination of timestamp and index values. If the index param is omitted, the order is determined by the timestamp only.\n\nNote: The default order for this API is currently DESC\n\n## Filtering\nWhen filtering there are some restrictions enforced to ensure correctness and scalability.\n\n**The table below defines the restrictions and support for the endpoint**\n\n| Query Param   | Comparison Operator | Support | Description           | Example |\n| ------------- | ------------------- | ------- | --------------------- | ------- |\n| index         | eq                  | Y       | Single occurrence only. Requires the presence of timestamp | ?index=X |\n|               | ne                  | N       | | |\n|               | lt(e)               | Y       | Single occurrence only. Requires the presence of timestamp | ?index=lte:X |\n|               | gt(e)               | Y       | Single occurrence only. Requires the presence of timestamp | ?index=gte:X |\n| timestamp     | eq                  | Y       | Single occurrence only. | ?timestamp=Y\n|               | ne                  | N       | | |\n|               | lt(e)               | Y       | Single occurrence only. Optional second timestamp **gt(e)** | ?timestamp=lte:Y\n|               | gt(e)               | Y       | Single occurrence only. Optional second timestamp **lt(e)** | ?timestamp=gte:Y\n\n\nBoth filters must be a single occurrence of **gt(e)** or **lt(e)** which provide a lower and or upper boundary for search.\n",
         "operationId": "listContractsLogs",
         "parameters": [
           {
@@ -1871,7 +1966,7 @@
   ],
   "info": {
     "title": "Hedera Mirror Node REST API",
-    "version": "0.76.0",
+    "version": "0.83.0",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
@@ -3349,13 +3444,117 @@
                 "items": {
                   "type": "object",
                   "properties": {
+                    "data": {
+                      "description": "Error message in hexadecimal",
+                      "example": "0x3000",
+                      "format": "binary",
+                      "nullable": true,
+                      "pattern": "^0x[0-9a-fA-F]+$",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Detailed error message",
+                      "example": "Generic detailed error message",
+                      "nullable": true,
+                      "type": "string"
+                    },
                     "message": {
+                      "description": "Error message",
+                      "example": "Generic error message",
+                      "nullable": false,
                       "type": "string"
                     }
                   }
                 }
               }
             }
+          }
+        }
+      },
+      "ContractCallRequest": {
+        "type": "object",
+        "properties": {
+          "block": {
+            "description": "Hexadecimal block number or the string \"latest\", \"pending\", \"earliest\". Defaults to \"latest\".",
+            "example": "latest",
+            "nullable": true,
+            "pattern": "^((0x)?[0-9a-fA-F]+|(earliest|pending|latest))$",
+            "type": "string"
+          },
+          "data": {
+            "description": "Hexadecimal method signature and encoded parameters.",
+            "example": "0x0198489200000000000000000000000000000000000000000000000000000000000003ee",
+            "format": "binary",
+            "maxLength": 12288,
+            "nullable": true,
+            "pattern": "^(0x)?[0-9a-fA-F]+$",
+            "type": "string"
+          },
+          "estimate": {
+            "description": "Whether gas estimation is called. Defaults to false.",
+            "example": true,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "from": {
+            "description": "The 20-byte hexadecimal EVM address the transaction is sent from.",
+            "example": "00000000000000000000000000000000000004e2",
+            "format": "binary",
+            "maxLength": 42,
+            "minLength": 40,
+            "nullable": true,
+            "pattern": "^(0x)?[A-Fa-f0-9]{40}$",
+            "type": "string"
+          },
+          "gas": {
+            "description": "Gas provided for the transaction execution. Defaults to 120000000.",
+            "example": 120000000,
+            "format": "int64",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "gasPrice": {
+            "description": "Gas price used for each paid gas.",
+            "example": 100000000,
+            "format": "int64",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "to": {
+            "description": "The 20-byte hexadecimal EVM address the transaction is directed to.",
+            "example": "0x00000000000000000000000000000000000003f4",
+            "format": "binary",
+            "maxLength": 42,
+            "minLength": 40,
+            "nullable": false,
+            "pattern": "^(0x)?[A-Fa-f0-9]{40}$",
+            "type": "string"
+          },
+          "value": {
+            "description": "Value sent with this transaction. Defaults to 0.",
+            "example": 0,
+            "format": "int64",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "to"
+        ]
+      },
+      "ContractCallResponse": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "description": "Result in hexadecimal from executed contract call.",
+            "example": "0x94c4d54535f6e616d6500",
+            "format": "binary",
+            "nullable": false,
+            "pattern": "^0x[0-9a-fA-F]+$",
+            "type": "string"
           }
         }
       },
@@ -3878,31 +4077,37 @@
             "type": "integer",
             "minimum": 0
           },
-          "transaction_id": {
-            "type": "string"
-          },
           "receiver_account_id": {
             "$ref": "#/components/schemas/EntityId"
           },
           "sender_account_id": {
             "$ref": "#/components/schemas/EntityId"
           },
+          "transaction_id": {
+            "type": "string"
+          },
           "type": {
             "$ref": "#/components/schemas/TransactionTypes"
-          },
-          "token_id": {
-            "$ref": "#/components/schemas/EntityId"
           }
         },
         "example": {
           "consensus_timestamp": "1618591023.997420021",
-          "id": "0.0.19789-1618591023-997420021",
           "is_approval": false,
+          "nonce": 0,
           "receiver_account_id": "0.0.11",
           "sender_account_id": "0.0.10",
-          "type": "CRYPTOTRANSFER",
-          "token_id": "0.0.1000"
-        }
+          "transaction_id": "0.0.19789-1618591023-997420021",
+          "type": "CRYPTOTRANSFER"
+        },
+        "required": [
+          "consensus_timestamp",
+          "is_approval",
+          "nonce",
+          "receiver_account_id",
+          "sender_account_id",
+          "transaction_id",
+          "type"
+        ]
       },
       "Block": {
         "type": "object",
@@ -3918,7 +4123,8 @@
             "nullable": true
           },
           "hapi_version": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "hash": {
             "type": "string"
@@ -3989,7 +4195,11 @@
           "links": {
             "$ref": "#/components/schemas/Links"
           }
-        }
+        },
+        "required": [
+          "transactions",
+          "links"
+        ]
       },
       "Schedule": {
         "type": "object",
@@ -4653,6 +4863,38 @@
           "name": {
             "$ref": "#/components/schemas/TransactionTypes"
           },
+          "nft_transfers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "is_approval": {
+                  "type": "boolean"
+                },
+                "receiver_account_id": {
+                  "$ref": "#/components/schemas/EntityId"
+                },
+                "sender_account_id": {
+                  "$ref": "#/components/schemas/EntityId"
+                },
+                "serial_number": {
+                  "example": 1,
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "token_id": {
+                  "$ref": "#/components/schemas/EntityId"
+                }
+              },
+              "required": [
+                "is_approval",
+                "receiver_account_id",
+                "sender_account_id",
+                "token_id",
+                "serial_number"
+              ]
+            }
+          },
           "node": {
             "$ref": "#/components/schemas/EntityId"
           },
@@ -4742,6 +4984,22 @@
           "max_fee": 33,
           "memo_base64": null,
           "name": "CRYPTOTRANSFER",
+          "nft_transfers": [
+            {
+              "is_approval": true,
+              "receiver_account_id": "0.0.121",
+              "sender_account_id": "0.0.122",
+              "serial_number": 1,
+              "token_id": "0.0.123"
+            },
+            {
+              "is_approval": true,
+              "receiver_account_id": "0.0.321",
+              "sender_account_id": "0.0.422",
+              "serial_number": 2,
+              "token_id": "0.0.123"
+            }
+          ],
           "node": "0.0.3",
           "nonce": 0,
           "parent_consensus_timestamp": "1234567890.000000007",
@@ -4834,34 +5092,6 @@
                       "$ref": "#/components/schemas/EntityId"
                     }
                   }
-                }
-              },
-              "nft_transfers": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "is_approval": {
-                      "type": "boolean"
-                    },
-                    "receiver_account_id": {
-                      "$ref": "#/components/schemas/EntityId"
-                    },
-                    "sender_account_id": {
-                      "$ref": "#/components/schemas/EntityId"
-                    },
-                    "serial_number": {
-                      "format": "int64",
-                      "type": "integer"
-                    },
-                    "token_id": {
-                      "$ref": "#/components/schemas/EntityId"
-                    }
-                  },
-                  "required": [
-                    "serial_number",
-                    "token_id"
-                  ]
                 }
               }
             }
@@ -5138,6 +5368,35 @@
           },
           "evmAddressWithShardAndRealm": {
             "value": "0.0.ac384c53f03855fa1b3616052f8ba32c6c2a2fec"
+          }
+        },
+        "schema": {
+          "pattern": "^(\\d{1,10}\\.){0,2}(\\d{1,10}|(0x)?[A-Fa-f0-9]{40}|(?:[A-Z2-7]{8})*(?:[A-Z2-7]{2}|[A-Z2-7]{4,5}|[A-Z2-7]{7,8}))$",
+          "type": "string"
+        }
+      },
+      "accountIdOrAliasOrEvmAddressQueryParam": {
+        "name": "account.id",
+        "in": "query",
+        "description": "Account id or account alias with no shard realm or evm address with no shard realm",
+        "examples": {
+          "aliasOnly": {
+            "value": "HIQQEXWKW53RKN4W6XXC4Q232SYNZ3SZANVZZSUME5B5PRGXL663UAQA"
+          },
+          "accountNumOnly": {
+            "value": 8
+          },
+          "realmAccountNum": {
+            "value": 0.8
+          },
+          "shardRealmAccountNum": {
+            "value": "0.0.8"
+          },
+          "evmAddress": {
+            "value": "ac384c53f03855fa1b3616052f8ba32c6c2a2fec"
+          },
+          "evmAddressWithPrefix": {
+            "value": 9.832019034092927e+47
           }
         },
         "schema": {
@@ -5859,6 +6118,17 @@
         "in": "path",
         "description": "The timestamp at which the associated transaction reached consensus",
         "required": true,
+        "example": 1234567890.0000007,
+        "schema": {
+          "type": "string",
+          "pattern": "^\\d{1,10}(.\\d{1,9})?$"
+        }
+      },
+      "stateTimestampQueryParam": {
+        "name": "timestamp",
+        "in": "query",
+        "description": "The timestamp at which the contract state is",
+        "required": false,
         "example": 1234567890.0000007,
         "schema": {
           "type": "string",

@@ -1,6 +1,6 @@
 {
   "name": "@bugbytes/hapi-hashpool",
-  "version": "0.35.0",
+  "version": "0.42.0",
   "description": "Hedera Hashpool Client",
   "main": "./lib/index.js",
   "exports": "./lib/index.js",
@@ -24,9 +24,9 @@
   },
   "homepage": "https://github.com/bugbytesinc/hapi-proto#readme",
   "peerDependencies": {
-    "@bugbytes/hapi-proto": "0.35.0",
-    "@bugbytes/hapi-util": "0.35.0",
-    "long": ">=5.2.0",
-    "protobufjs": ">=7.2.0"
+    "@bugbytes/hapi-proto": "0.42.0",
+    "@bugbytes/hapi-util": "0.42.0",
+    "long": ">=5.2.3",
+    "protobufjs": ">=7.2.5"
   }
 }

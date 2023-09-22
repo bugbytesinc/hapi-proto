@@ -26,8 +26,10 @@ function prepareHapiProto() {
     fs.mkdirSync(combinedProtoDir);
     fs.mkdirSync(srcTypescriptProtoDir);
 
-    for (const file of fs.readdirSync(servicesProtoDir)) {
-        fs.copyFileSync(path.join(servicesProtoDir, file), path.join(combinedProtoDir, file));
+    for (const file of fs.readdirSync(servicesProtoDir)) {        
+        if(fs.statSync(path.join(servicesProtoDir, file)).isFile()){
+            fs.copyFileSync(path.join(servicesProtoDir, file), path.join(combinedProtoDir, file));
+        }
     }
     for (const file of fs.readdirSync(mirrorProtoDir)) {
         fs.copyFileSync(path.join(mirrorProtoDir, file), path.join(combinedProtoDir, file.startsWith('mirror_') ? file : 'mirror_' + file));

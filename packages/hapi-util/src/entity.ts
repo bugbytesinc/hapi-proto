@@ -1,4 +1,4 @@
-import * as ed from '@noble/ed25519';
+import { bytesToHex } from '@noble/hashes/utils';
 import type { AccountID, ContractID, FileID, ScheduleID, TokenID, TopicID } from "@bugbytes/hapi-proto";
 
 export type EntityIdKeyString = `${number}.${number}.${number}` | `${number}.${number}.${string}`;
@@ -9,7 +9,7 @@ export function accountID_to_keyString(account: AccountID): EntityIdKeyString {
         case 'accountNum':
             return `${account.shardNum}.${account.realmNum}.${account.account.accountNum}`;
         case 'alias':
-            return `${account.shardNum}.${account.realmNum}.${ed.utils.bytesToHex(account.account.alias)}`;
+            return `${account.shardNum}.${account.realmNum}.${bytesToHex(account.account.alias)}`;
         default:
             throw Error(`Entity type not supported yet.`);
     }
@@ -36,7 +36,7 @@ export function contractID_to_keyString(contract: ContractID): EntityIdKeyString
         case 'contractNum':
             return `${contract.shardNum}.${contract.realmNum}.${contract.contract.contractNum}`;
         case 'evmAddress':
-            return `${contract.shardNum}.${contract.realmNum}.${ed.utils.bytesToHex(contract.contract.evmAddress)}`;
+            return `${contract.shardNum}.${contract.realmNum}.${bytesToHex(contract.contract.evmAddress)}`;
         default:
             throw Error(`Entity type not supported yet.`);
     }
